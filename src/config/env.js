@@ -30,6 +30,7 @@ const config = {
   // Límites del contador visible de intentos
   maxLoginAttempts: Number(process.env.MAX_LOGIN_ATTEMPTS) || 5,
   maxMfaAttempts: Number(process.env.MAX_MFA_ATTEMPTS) || 3,
+  loginBloqueoMinutos: Number(process.env.LOGIN_BLOQUEO_MINUTOS) || 15,
 };
 
 // Avisa (sin detener el servidor) si falta alguna variable importante

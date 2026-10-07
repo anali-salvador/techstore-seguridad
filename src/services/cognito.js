@@ -4,6 +4,7 @@ const {
   SignUpCommand,
   ConfirmSignUpCommand,
   ResendConfirmationCodeCommand,
+  InitiateAuthCommand,
   AdminUpdateUserAttributesCommand,
   AdminAddUserToGroupCommand,
 } = require('@aws-sdk/client-cognito-identity-provider');
@@ -62,6 +63,19 @@ async function reenviarCodigo(email) {
   return cognito.send(new ResendConfirmationCodeCommand({ ClientId: clientId, Username: email }));
 }
 
+// 4) Login con correo y contraseña (flujo USER_PASSWORD_AUTH).
+//    Como el MFA es obligatorio, Cognito NO devuelve el JWT aquí: devuelve un
+//    "reto" (ChallengeName) y una Session temporal para continuar con el MFA.
+async function iniciarSesion(email, password) {
+  return cognito.send(
+    new InitiateAuthCommand({
+      ClientId: clientId,
+      AuthFlow: 'USER_PASSWORD_AUTH',
+      AuthParameters: { USERNAME: email, PASSWORD: password },
+    })
+  );
+}
+
 // Traduce los errores de Cognito a mensajes en español para el usuario
 function traducirError(err) {
   const mensajes = {
@@ -84,6 +98,7 @@ module.exports = {
   asignarTiendaYRol,
   confirmarRegistro,
   reenviarCodigo,
+  iniciarSesion,
   traducirError,
   GRUPO_POR_DEFECTO,
 };

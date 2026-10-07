@@ -3,8 +3,23 @@ const express = require('express');
 const { TIENDAS, esTiendaValida } = require('../config/tiendas');
 const { validarPassword, validarEmail } = require('../services/validaciones');
 const cognito = require('../services/cognito');
+const ContadorIntentos = require('../services/intentos');
+const config = require('../config/env');
 
 const router = express.Router();
+
+// Contador visible de intentos de login: 5 fallos -> bloqueo de 15 minutos
+const intentosLogin = new ContadorIntentos(config.maxLoginAttempts, config.loginBloqueoMinutos);
+
+// A qué página va el usuario según el reto MFA que devuelve Cognito
+const PAGINAS_MFA = {
+  MFA_SETUP: '/mfa-configurar.html', // primer login: aún no configuró Google Authenticator
+  SOFTWARE_TOKEN_MFA: '/mfa-codigo.html', // logins siguientes: pide el código de 6 dígitos
+};
+
+// Crea una sesión nueva (nuevo ID de cookie) para evitar la "fijación de sesión"
+const regenerarSesion = (req) =>
+  new Promise((resolve, reject) => req.session.regenerate((err) => (err ? reject(err) : resolve())));
 
 // Normaliza el correo para que "Ana@Mail.com" y "ana@mail.com" sean el mismo usuario
 const limpiarEmail = (email) => (email || '').trim().toLowerCase();
@@ -75,6 +90,77 @@ router.post('/auth/reenviar-codigo', async (req, res) => {
     console.error('[reenviar-codigo]', err.name, err.message);
     res.status(400).json({ error: cognito.traducirError(err) });
   }
+});
+
+// POST /api/auth/login -> paso 1 del login: correo + contraseña
+router.post('/auth/login', async (req, res) => {
+  const email = limpiarEmail(req.body.email);
+  const password = req.body.password || '';
+  if (!validarEmail(email) || !password) {
+    return res.status(400).json({ error: 'Ingresa tu correo y contraseña.' });
+  }
+
+  // Si la cuenta ya está bloqueada, ni siquiera se consulta a Cognito
+  const previo = intentosLogin.estado(email);
+  if (previo.bloqueado) {
+    return res.status(423).json({ error: 'Cuenta bloqueada temporalmente por intentos fallidos.', intentos: previo });
+  }
+
+  let respuesta;
+  try {
+    respuesta = await cognito.iniciarSesion(email, password);
+  } catch (err) {
+    console.error('[login]', err.name, err.message);
+
+    // Cuenta registrada pero sin verificar el correo (no cuenta como intento fallido)
+    if (err.name === 'UserNotConfirmedException') {
+      return res.status(403).json({
+        error: 'Tu cuenta aún no está verificada. Ingresa el código que llegó a tu correo.',
+        siguiente: `/confirmar.html?email=${encodeURIComponent(email)}`,
+      });
+    }
+
+    // Contraseña incorrecta o usuario inexistente: se suma un intento fallido.
+    // El mensaje es el mismo en ambos casos para no revelar qué correos existen.
+    if (err.name === 'NotAuthorizedException' || err.name === 'UserNotFoundException') {
+      const estado = intentosLogin.registrarFallo(email);
+      // Cognito también tiene su propio bloqueo nativo tras varios fallos
+      const bloqueoCognito = /attempts exceeded/i.test(err.message);
+      if (estado.bloqueado || bloqueoCognito) {
+        return res.status(423).json({
+          error: `Cuenta bloqueada temporalmente tras ${estado.fallidos} intentos fallidos.`,
+          intentos: estado,
+        });
+      }
+      return res.status(401).json({ error: 'Correo o contraseña incorrectos.', intentos: estado });
+    }
+
+    return res.status(500).json({ error: cognito.traducirError(err) });
+  }
+
+  // Credenciales correctas: el contador vuelve a cero
+  intentosLogin.reiniciar(email);
+
+  const reto = respuesta.ChallengeName;
+  if (!PAGINAS_MFA[reto]) {
+    // Con MFA obligatorio, Cognito siempre debería pedir un reto MFA
+    console.error('[login] Respuesta inesperada de Cognito:', reto || 'sin reto (MFA no exigido)');
+    return res.status(500).json({ error: 'El login requiere MFA y no se pudo iniciar. Contacta al administrador.' });
+  }
+
+  // Se guarda la Session de Cognito en el SERVIDOR (el navegador nunca la ve).
+  // Aún NO hay JWT: el usuario solo tiene acceso después de pasar el MFA.
+  await regenerarSesion(req);
+  req.session.mfa = { email, reto, cognitoSession: respuesta.Session, creadoEn: Date.now() };
+
+  res.json({
+    mensaje:
+      reto === 'MFA_SETUP'
+        ? 'Credenciales correctas. Ahora configura tu verificación en dos pasos.'
+        : 'Credenciales correctas. Ingresa tu código de verificación.',
+    reto,
+    siguiente: PAGINAS_MFA[reto],
+  });
 });
 
 module.exports = router;
