@@ -17,6 +17,13 @@ const nombreTienda = (id) => (tiendas.find((t) => t.id === id) || {}).nombre || 
 const fecha = (segundos) => new Date(segundos * 1000).toLocaleString('es-PE');
 const poner = (id, texto) => (document.getElementById(id).textContent = texto);
 
+// Cómo inició sesión el usuario
+const ORIGENES = {
+  cognito: 'Correo y contraseña (Cognito)',
+  google: 'Google (federado en Cognito)',
+  github: 'GitHub (Passport.js)',
+};
+
 // Lista de permisos que se muestran en el perfil
 const ACCIONES = [
   ['productos:ver', 'Ver productos'],
@@ -44,6 +51,11 @@ async function cargarSesion() {
   poner('dato-tienda', usuario.tienda || '(sin asignar)');
   poner('dato-emitido', fecha(usuario.emitido));
   poner('dato-expira', fecha(usuario.expira));
+  poner('dato-origen', ORIGENES[usuario.origen] || usuario.origen);
+  poner(
+    'dato-firma',
+    usuario.origen === 'github' ? 'Verificada (HS256, JWT propio de la app)' : 'Verificada (RS256, JWKS de Cognito)'
+  );
   poner('token-vista', datos.token.vista);
   poner('token-longitud', `${datos.token.longitud} caracteres · guardado en cookie httpOnly`);
   poner(
@@ -299,9 +311,10 @@ document.getElementById('generar-reporte').addEventListener('click', cargarRepor
 
 document.getElementById('cerrar-sesion').addEventListener('click', async (e) => {
   e.currentTarget.disabled = true;
-  await postJSON('/api/auth/logout', {});
+  const { datos } = await postJSON('/api/auth/logout', {});
   mostrarMensaje(mensaje, 'Sesión cerrada.', 'ok');
-  setTimeout(() => location.replace('/login.html'), 800);
+  // Si entró con Google, "siguiente" es el logout del Hosted UI de Cognito
+  setTimeout(() => location.replace(datos.siguiente || '/login.html'), 800);
 });
 
 // ---------- Inicio ----------

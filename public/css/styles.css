@@ -1372,6 +1372,39 @@ select {
   margin-top: var(--esp-4);
 }
 
+/* Botones de login social (Google / GitHub) con efecto cristal */
+.botones-sociales {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--esp-3);
+}
+.btn-social {
+  margin-top: 0;
+  padding: 0 var(--esp-3);
+  font-size: var(--texto-sm);
+  color: var(--color-texto);
+  background: rgba(255, 255, 255, 0.65);
+  border-color: var(--color-borde-campo);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.btn-social:hover {
+  color: var(--color-texto);
+  background: #fff;
+  border-color: var(--color-borde-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -14px rgba(49, 46, 129, 0.45);
+}
+/* Los logos de marca usan sus propios colores (sin el trazo de los iconos de línea) */
+.icono-marca {
+  stroke: none;
+  fill: currentColor;
+}
+.btn-social .icono-marca {
+  width: 18px;
+  height: 18px;
+}
+
 /* ---------- 14. Animaciones ---------- */
 @keyframes entrada {
   from {
@@ -1433,7 +1466,8 @@ select {
   .escena--ancha .card {
     padding: var(--esp-5) var(--esp-4);
   }
-  .herramientas {
+  .herramientas,
+  .botones-sociales {
     grid-template-columns: 1fr;
   }
   :root {

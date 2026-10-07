@@ -37,6 +37,20 @@ function desbloquear() {
   mensaje.hidden = true;
 }
 
+// Errores del login social: el servidor solo manda un código, nunca el detalle técnico
+const ERRORES_SOCIALES = {
+  social: 'No se pudo iniciar sesión con el proveedor externo. Inténtalo de nuevo.',
+  correo: 'Tu cuenta de GitHub no tiene un correo verificado. Verifica uno en GitHub e inténtalo de nuevo.',
+  vinculo: 'No se pudo vincular tu cuenta: el correo debe estar verificado en ambas cuentas.',
+  bloqueado: 'La verificación en dos pasos está bloqueada temporalmente por códigos incorrectos.',
+  deshabilitado: 'Tu cuenta está deshabilitada. Contacta al administrador.',
+};
+const errorSocial = new URLSearchParams(location.search).get('error');
+if (ERRORES_SOCIALES[errorSocial]) {
+  mostrarMensaje(mensaje, ERRORES_SOCIALES[errorSocial]);
+  history.replaceState(null, '', '/login.html'); // limpia la URL
+}
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const datos = Object.fromEntries(new FormData(form));
