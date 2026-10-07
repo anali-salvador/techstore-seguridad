@@ -4,6 +4,7 @@ const express = require('express');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const config = require('./config/env');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 
@@ -29,6 +30,9 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, app: 'TechStore', hora: new Date().toISOString() });
 });
+
+// Rutas de la API
+app.use('/api', authRoutes);
 
 app.listen(config.port, () => {
   console.log(`TechStore escuchando en http://localhost:${config.port}`);
