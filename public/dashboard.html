@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body>
+<body class="pagina-panel">
   <!-- Fondo decorativo con formas difuminadas -->
   <div class="fondo" aria-hidden="true">
     <span class="blob blob-1"></span>
@@ -18,25 +18,44 @@
     <span class="blob blob-3"></span>
   </div>
 
-  <main class="escena escena--media">
-    <div class="flotante">
-      <section class="card">
-        <header class="cabecera">
-          <img class="logo" src="/img/logo.svg" alt="">
+  <main class="escena escena--ancha pila">
+    <!-- 1. Perfil: datos del JWT y permisos del rol -->
+    <section class="card card--estatica">
+      <div class="perfil-fila">
+        <img class="logo logo--pequeno" src="/img/logo.svg" alt="">
+        <div class="perfil-texto">
           <h1 id="saludo">Bienvenido</h1>
           <p class="subtitulo">Sesión iniciada con verificación en dos pasos.</p>
-          <div class="pildoras">
-            <span class="pildora"><svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#usuario"/></svg><span id="rol">—</span></span>
-            <span class="pildora"><svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#tienda"/></svg><span id="tienda">—</span></span>
-            <span class="pildora pildora--ok"><svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#escudo"/></svg>MFA activo</span>
-          </div>
-        </header>
+        </div>
+        <div class="perfil-acciones">
+          <a id="enlace-admin" class="btn btn-secundario btn-pequeno" href="/admin.html" hidden>
+            <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#usuarios"/></svg>
+            Usuarios
+          </a>
+          <button type="button" id="cerrar-sesion" class="btn btn-secundario btn-pequeno">
+            <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#salir"/></svg>
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
 
-        <!-- Datos tomados del JWT (ID token) verificado por el servidor -->
-        <h2 class="titulo-seccion">
+      <div class="pildoras pildoras--izquierda">
+        <span class="pildora"><svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#usuario"/></svg><span id="rol">—</span></span>
+        <span class="pildora"><svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#tienda"/></svg><span id="tienda">—</span></span>
+        <span class="pildora pildora--ok"><svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#escudo"/></svg>MFA activo</span>
+      </div>
+
+      <h2 class="titulo-seccion">
+        <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#escudo"/></svg>
+        Permisos de tu rol <span id="alcance" class="nota-en-linea"></span>
+      </h2>
+      <ul id="lista-permisos" class="permisos"></ul>
+
+      <details class="desplegable">
+        <summary>
           <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#llave"/></svg>
-          Token JWT de Cognito
-        </h2>
+          Ver token JWT de Cognito
+        </summary>
         <dl class="datos">
           <div><dt>Correo</dt><dd id="dato-email">—</dd></div>
           <div><dt>Grupos (cognito:groups)</dt><dd id="dato-grupos">—</dd></div>
@@ -49,16 +68,167 @@
           <code id="token-vista">…</code>
           <span id="token-longitud" class="nota"></span>
         </div>
+      </details>
+      <div id="mensaje" class="msg" role="status" aria-live="polite" hidden></div>
+    </section>
 
-        <button type="button" id="cerrar-sesion" class="btn btn-secundario">
-          <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#salir"/></svg>
-          Cerrar sesión
+    <!-- 2. Inventario: botones según el rol -->
+    <section class="card card--estatica" id="seccion-inventario">
+      <div class="seccion-cabecera">
+        <h2 class="titulo-seccion">
+          <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#paquete"/></svg>
+          Inventario
+        </h2>
+        <button type="button" id="nuevo-producto" class="btn btn-primario btn-pequeno" hidden>
+          <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#mas"/></svg>
+          Nuevo producto
         </button>
-        <div id="mensaje" class="msg" role="status" aria-live="polite" hidden></div>
-      </section>
-    </div>
+      </div>
+
+      <div class="herramientas">
+        <div class="control">
+          <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#buscar"/></svg>
+          <input id="buscar" type="search" placeholder="Buscar por nombre o categoría" aria-label="Buscar producto">
+        </div>
+        <div class="control" id="filtro-tienda-caja" hidden>
+          <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#tienda"/></svg>
+          <select id="filtro-tienda" aria-label="Filtrar por tienda">
+            <option value="">Todas las tiendas</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="mensaje-inventario" class="msg" role="status" aria-live="polite" hidden></div>
+
+      <div class="tabla-contenedor">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Categoría</th>
+              <th>Tienda</th>
+              <th class="num">Precio</th>
+              <th class="num">Stock</th>
+              <th class="col-acciones">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-productos"></tbody>
+        </table>
+      </div>
+      <p id="inventario-vacio" class="vacio" hidden>No hay productos para mostrar.</p>
+    </section>
+
+    <!-- 3. Reportes (Administrador, Gerente y Auditor) -->
+    <section class="card card--estatica" id="seccion-reportes" hidden>
+      <div class="seccion-cabecera">
+        <h2 class="titulo-seccion">
+          <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#grafico"/></svg>
+          Reporte de inventario
+        </h2>
+        <button type="button" id="generar-reporte" class="btn btn-secundario btn-pequeno">
+          <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#recargar"/></svg>
+          Generar reporte
+        </button>
+      </div>
+      <div id="estadisticas" class="estadisticas"></div>
+      <div class="tabla-contenedor">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Tienda</th>
+              <th class="num">Productos</th>
+              <th class="num">Unidades</th>
+              <th class="num">Valor del inventario</th>
+              <th>Stock bajo</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-reporte"></tbody>
+        </table>
+      </div>
+      <p id="reporte-pie" class="nota"></p>
+    </section>
+
+    <!-- 4. Pruebas de seguridad: acciones bloqueadas para este rol -->
+    <section class="card card--estatica" id="seccion-pruebas" hidden>
+      <h2 class="titulo-seccion">
+        <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#prohibido"/></svg>
+        Prueba de permisos
+      </h2>
+      <p class="nota">
+        Estas acciones están bloqueadas para tu rol. El botón llama directamente a la API
+        (sin pasar por la interfaz) para demostrar que el servidor responde <strong>403</strong>.
+      </p>
+      <ul id="lista-pruebas" class="pruebas"></ul>
+    </section>
+
     <p class="pie">TechStore · Seguridad en la nube con AWS</p>
   </main>
+
+  <!-- Diálogo para crear o editar un producto -->
+  <dialog id="dialogo-producto" class="dialogo" aria-labelledby="dialogo-producto-titulo">
+    <form id="form-producto" novalidate>
+      <div class="dialogo-cabecera">
+        <h2 id="dialogo-producto-titulo">Nuevo producto</h2>
+        <button type="button" class="btn-icono" data-cerrar aria-label="Cerrar">
+          <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#cerrar"/></svg>
+        </button>
+      </div>
+      <div class="campo">
+        <label for="p-nombre">Nombre</label>
+        <div class="control">
+          <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#paquete"/></svg>
+          <input id="p-nombre" name="nombre" maxlength="80" required>
+        </div>
+      </div>
+      <div class="campo">
+        <label for="p-categoria">Categoría</label>
+        <div class="control">
+          <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#codigo"/></svg>
+          <input id="p-categoria" name="categoria" maxlength="40" required>
+        </div>
+      </div>
+      <div class="campo" id="p-tienda-campo">
+        <label for="p-tienda">Tienda</label>
+        <div class="control">
+          <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#tienda"/></svg>
+          <select id="p-tienda" name="tienda"></select>
+        </div>
+      </div>
+      <div class="campos-dobles">
+        <div class="campo">
+          <label for="p-precio">Precio (S/)</label>
+          <input id="p-precio" name="precio" type="number" min="0" step="0.01" required>
+        </div>
+        <div class="campo">
+          <label for="p-stock">Stock</label>
+          <input id="p-stock" name="stock" type="number" min="0" step="1" required>
+        </div>
+      </div>
+      <div id="mensaje-producto" class="msg" role="status" aria-live="polite" hidden></div>
+      <div class="dialogo-acciones">
+        <button type="button" class="btn btn-secundario" data-cerrar>Cancelar</button>
+        <button type="submit" class="btn btn-primario">
+          <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#check"/></svg>
+          Guardar
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Diálogo de confirmación para eliminar -->
+  <dialog id="dialogo-eliminar" class="dialogo dialogo--pequeno" aria-labelledby="dialogo-eliminar-titulo">
+    <div class="dialogo-cabecera">
+      <h2 id="dialogo-eliminar-titulo">Eliminar producto</h2>
+    </div>
+    <p>¿Seguro que deseas eliminar <strong id="eliminar-nombre"></strong>? Esta acción no se puede deshacer.</p>
+    <div class="dialogo-acciones">
+      <button type="button" class="btn btn-secundario" data-cerrar>Cancelar</button>
+      <button type="button" id="confirmar-eliminar" class="btn btn-peligro">
+        <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#basura"/></svg>
+        Eliminar
+      </button>
+    </div>
+  </dialog>
 
   <script src="/js/comun.js"></script>
   <script src="/js/dashboard.js"></script>

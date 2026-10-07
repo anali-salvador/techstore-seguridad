@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechStore - Usuarios</title>
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="pagina-panel">
+  <!-- Fondo decorativo con formas difuminadas -->
+  <div class="fondo" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <main class="escena escena--ancha pila">
+    <section class="card card--estatica">
+      <div class="perfil-fila">
+        <img class="logo logo--pequeno" src="/img/logo.svg" alt="">
+        <div class="perfil-texto">
+          <h1>Gestión de usuarios</h1>
+          <p class="subtitulo">Asigna el rol (grupo de Cognito) y la tienda de cada usuario.</p>
+        </div>
+        <div class="perfil-acciones">
+          <a class="btn btn-secundario btn-pequeno" href="/dashboard.html">
+            <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#volver"/></svg>
+            Volver al panel
+          </a>
+        </div>
+      </div>
+
+      <div class="msg aviso aviso-fijo">
+        Los cambios de rol y tienda se guardan en Cognito al instante, pero el usuario los verá
+        cuando vuelva a iniciar sesión (su JWT actual conserva los datos anteriores hasta que expire).
+      </div>
+
+      <div id="mensaje" class="msg" role="status" aria-live="polite" hidden></div>
+
+      <div class="tabla-contenedor">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Estado</th>
+              <th>Rol</th>
+              <th>Tienda</th>
+              <th class="col-acciones">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-usuarios"></tbody>
+        </table>
+      </div>
+      <p id="usuarios-vacio" class="vacio" hidden>No hay usuarios registrados.</p>
+    </section>
+    <p class="pie">TechStore · Seguridad en la nube con AWS</p>
+  </main>
+
+  <script src="/js/comun.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

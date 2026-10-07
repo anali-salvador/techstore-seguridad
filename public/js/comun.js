@@ -42,7 +42,56 @@ function pintarContador(intentos, consecuencia = 'antes del bloqueo') {
 
 // Envía un GET y devuelve { ok, status, datos }
 async function getJSON(url) {
-  const res = await fetch(url);
+  return pedir('GET', url);
+}
+
+// Petición con cualquier método (GET, POST, PUT, PATCH, DELETE) y devuelve { ok, status, datos }
+async function pedir(metodo, url, cuerpo) {
+  const opciones = { method: metodo, headers: {} };
+  if (cuerpo !== undefined) {
+    opciones.headers['Content-Type'] = 'application/json';
+    opciones.body = JSON.stringify(cuerpo);
+  }
+  const res = await fetch(url, opciones);
   const datos = await res.json().catch(() => ({}));
   return { ok: res.ok, status: res.status, datos };
 }
+
+// Crea un elemento HTML de forma segura: el texto va con textContent (nunca innerHTML),
+// así un nombre de producto como "<script>" se muestra como texto y no se ejecuta (evita XSS).
+// Ej: crear('td', { className: 'num' }, 'S/ 10.00')
+function crear(etiqueta, propiedades = {}, ...hijos) {
+  const el = document.createElement(etiqueta);
+  for (const [clave, valor] of Object.entries(propiedades)) {
+    if (clave === 'dataset') Object.assign(el.dataset, valor);
+    else if (clave.startsWith('aria-') || clave === 'role') el.setAttribute(clave, valor);
+    else el[clave] = valor;
+  }
+  for (const hijo of hijos.flat()) {
+    if (hijo === null || hijo === undefined || hijo === false) continue;
+    el.append(hijo instanceof Node ? hijo : document.createTextNode(String(hijo)));
+  }
+  return el;
+}
+
+// Crea un icono del sprite: icono('lapiz')
+function icono(nombre, clase = '') {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', `icono ${clase}`.trim());
+  svg.setAttribute('aria-hidden', 'true');
+  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+  use.setAttribute('href', `/img/iconos.svg#${nombre}`);
+  svg.appendChild(use);
+  return svg;
+}
+
+// Nombres legibles de los roles (grupos de Cognito)
+const NOMBRES_ROL = {
+  Administrador: 'Administrador',
+  GerenteTienda: 'Gerente de Tienda',
+  EmpleadoVentas: 'Empleado de Ventas',
+  Auditor: 'Auditor',
+};
+
+// Formato de moneda peruana: S/ 1,234.50
+const formatoSoles = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' });
