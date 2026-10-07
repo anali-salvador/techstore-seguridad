@@ -43,7 +43,7 @@ router.put('/usuarios/:username', async (req, res) => {
   if (tienda && !esTiendaValida(tienda)) return res.status(400).json({ error: 'Tienda no válida.' });
 
   try {
-    await cognito.cambiarRol(username, rol);
+    await cognito.cambiarRol(username, rol, PRIORIDAD);
     if (tienda) await cognito.cambiarTienda(username, tienda);
     console.log(`[admin] ${req.usuario.email} asignó rol=${rol} tienda=${tienda || '-'} a ${username}`);
     res.json({ mensaje: 'Cambios guardados. Se aplican cuando el usuario vuelva a iniciar sesión.' });

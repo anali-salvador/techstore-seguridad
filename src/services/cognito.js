@@ -180,13 +180,15 @@ async function listarUsuarios(grupos) {
   return usuarios;
 }
 
-// Deja al usuario en UN solo grupo: lo saca de los demás y lo agrega al nuevo
-async function cambiarRol(username, nuevoRol) {
+// Deja al usuario con UN solo rol: lo saca de los otros grupos de rol y lo agrega al nuevo.
+// "roles" son los 4 grupos de la app: los demás grupos (como el "<pool>_Google" que Cognito
+// crea solo para los usuarios federados) no se tocan.
+async function cambiarRol(username, nuevoRol, roles) {
   const actuales = await cognito.send(
     new AdminListGroupsForUserCommand({ UserPoolId: userPoolId, Username: username })
   );
   for (const g of actuales.Groups) {
-    if (g.GroupName !== nuevoRol) {
+    if (g.GroupName !== nuevoRol && roles.includes(g.GroupName)) {
       await cognito.send(
         new AdminRemoveUserFromGroupCommand({ UserPoolId: userPoolId, Username: username, GroupName: g.GroupName })
       );
