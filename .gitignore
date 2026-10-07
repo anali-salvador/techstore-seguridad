@@ -1,0 +1,17 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (contienen secretos, NUNCA subir a git)
+.env
+.env.*
+!.env.example
+
+# Logs y archivos del sistema
+npm-debug.log*
+*.log
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
