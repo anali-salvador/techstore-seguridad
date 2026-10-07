@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechStore - Panel</title>
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <!-- Fondo decorativo con formas difuminadas -->
+  <div class="fondo" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <main class="escena escena--media">
+    <div class="flotante">
+      <section class="card">
+        <header class="cabecera">
+          <img class="logo" src="/img/logo.svg" alt="">
+          <h1 id="saludo">Bienvenido</h1>
+          <p class="subtitulo">Sesión iniciada con verificación en dos pasos.</p>
+          <div class="pildoras">
+            <span class="pildora"><svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#usuario"/></svg><span id="rol">—</span></span>
+            <span class="pildora"><svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#tienda"/></svg><span id="tienda">—</span></span>
+            <span class="pildora pildora--ok"><svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#escudo"/></svg>MFA activo</span>
+          </div>
+        </header>
+
+        <!-- Datos tomados del JWT (ID token) verificado por el servidor -->
+        <h2 class="titulo-seccion">
+          <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#llave"/></svg>
+          Token JWT de Cognito
+        </h2>
+        <dl class="datos">
+          <div><dt>Correo</dt><dd id="dato-email">—</dd></div>
+          <div><dt>Grupos (cognito:groups)</dt><dd id="dato-grupos">—</dd></div>
+          <div><dt>Tienda (custom:tienda)</dt><dd id="dato-tienda">—</dd></div>
+          <div><dt>Emitido</dt><dd id="dato-emitido">—</dd></div>
+          <div><dt>Expira</dt><dd id="dato-expira">—</dd></div>
+          <div><dt>Firma</dt><dd><span class="estado-ok">Verificada (RS256, JWKS de Cognito)</span></dd></div>
+        </dl>
+        <div class="token">
+          <code id="token-vista">…</code>
+          <span id="token-longitud" class="nota"></span>
+        </div>
+
+        <button type="button" id="cerrar-sesion" class="btn btn-secundario">
+          <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#salir"/></svg>
+          Cerrar sesión
+        </button>
+        <div id="mensaje" class="msg" role="status" aria-live="polite" hidden></div>
+      </section>
+    </div>
+    <p class="pie">TechStore · Seguridad en la nube con AWS</p>
+  </main>
+
+  <script src="/js/comun.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

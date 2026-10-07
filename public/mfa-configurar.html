@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechStore - Configurar MFA</title>
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body data-pagina="mfa-configurar">
+  <!-- Fondo decorativo con formas difuminadas -->
+  <div class="fondo" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <main class="escena">
+    <div class="flotante">
+      <section class="card">
+        <header class="cabecera">
+          <img class="logo" src="/img/logo.svg" alt="">
+          <h1>Activa la verificación en dos pasos</h1>
+          <p class="subtitulo">Es obligatoria para todas las cuentas de TechStore.</p>
+          <p class="centrado"><span id="email-usuario" class="pildora">&nbsp;</span></p>
+        </header>
+
+        <!-- Pasos para configurar Google Authenticator -->
+        <ol class="pasos">
+          <li>
+            <span class="paso-numero">1</span>
+            <div>
+              <strong>Instala Google Authenticator</strong>
+              <p>Descárgala gratis desde Play Store o App Store.</p>
+            </div>
+          </li>
+          <li>
+            <span class="paso-numero">2</span>
+            <div>
+              <strong>Escanea el código QR</strong>
+              <p>En la app toca <em>+</em> y luego <em>Escanear un código QR</em>.</p>
+            </div>
+          </li>
+        </ol>
+
+        <div class="qr-caja">
+          <div id="qr-cargando" class="qr-esqueleto" aria-label="Generando código QR"></div>
+          <img id="qr" alt="Código QR para agregar TechStore a Google Authenticator" width="200" height="200" hidden>
+        </div>
+
+        <details class="clave-manual">
+          <summary>¿No puedes escanear? Ingresa la clave manualmente</summary>
+          <div class="secreto-fila">
+            <code id="secreto" class="secreto">····</code>
+            <button type="button" id="copiar" class="btn-icono" aria-label="Copiar clave">
+              <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#copiar"/></svg>
+            </button>
+          </div>
+          <p class="nota">Tipo de clave: <strong>Basada en el tiempo</strong> · Nombre: <strong>TechStore</strong></p>
+        </details>
+
+        <ol class="pasos" start="3">
+          <li>
+            <span class="paso-numero">3</span>
+            <div>
+              <strong>Ingresa el código de 6 dígitos</strong>
+              <p>El que aparece en la app para TechStore.</p>
+            </div>
+          </li>
+        </ol>
+
+        <form id="form-mfa" novalidate>
+          <div class="campo">
+            <label for="codigo">Código de verificación</label>
+            <div class="control">
+              <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#celular"/></svg>
+              <input id="codigo" name="codigo" class="input-codigo" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000" required>
+            </div>
+            <!-- Tiempo que le queda al código actual (TOTP cambia cada 30 s) -->
+            <div class="ciclo-totp" aria-hidden="true">
+              <span class="ciclo-barra"><span id="ciclo-progreso"></span></span>
+              <span id="ciclo-texto">Nuevo código en 30 s</span>
+            </div>
+          </div>
+
+          <!-- Contador visible de intentos de MFA (máximo 3) -->
+          <div id="contador" class="contador" aria-live="polite" hidden>
+            <div class="contador-cabecera">
+              <span>Códigos incorrectos</span>
+              <strong id="contador-texto">0 de 3</strong>
+            </div>
+            <div id="contador-barra" class="contador-barra" aria-hidden="true"></div>
+            <p id="contador-ayuda" class="contador-ayuda"></p>
+          </div>
+
+          <button type="submit" class="btn btn-primario">
+            <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#escudo"/></svg>
+            Verificar y activar
+          </button>
+        </form>
+        <div id="mensaje" class="msg" role="status" aria-live="polite" hidden></div>
+        <p class="enlaces"><a href="/login.html" id="cancelar">Cancelar e iniciar sesión de nuevo</a></p>
+      </section>
+    </div>
+    <p class="pie">TechStore · Seguridad en la nube con AWS</p>
+  </main>
+
+  <script src="/js/comun.js"></script>
+  <script src="/js/mfa.js"></script>
+</body>
+</html>

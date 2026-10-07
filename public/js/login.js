@@ -4,30 +4,10 @@ const mensaje = document.getElementById('mensaje');
 const boton = form.querySelector('button');
 const inputPassword = document.getElementById('password');
 
-// Elementos del contador visible de intentos
+// Elementos del contador visible de intentos (pintarContador está en comun.js)
 const contador = document.getElementById('contador');
-const contadorTexto = document.getElementById('contador-texto');
-const contadorBarra = document.getElementById('contador-barra');
 const contadorAyuda = document.getElementById('contador-ayuda');
 let temporizador = null;
-
-// Dibuja "X de 5" y una barra con un segmento por intento
-function pintarContador(intentos) {
-  contador.hidden = intentos.fallidos === 0;
-  contadorTexto.textContent = `${intentos.fallidos} de ${intentos.maximo}`;
-  contadorBarra.innerHTML = '';
-  for (let i = 0; i < intentos.maximo; i++) {
-    const segmento = document.createElement('span');
-    segmento.className = i < intentos.fallidos ? 'segmento usado' : 'segmento';
-    contadorBarra.appendChild(segmento);
-  }
-  contador.classList.toggle('critico', intentos.restantes <= 1);
-  contadorAyuda.textContent = intentos.bloqueado
-    ? ''
-    : intentos.restantes === 1
-      ? 'Te queda 1 intento antes del bloqueo.'
-      : `Te quedan ${intentos.restantes} intentos antes del bloqueo.`;
-}
 
 // Activa o desactiva el formulario completo
 function habilitarFormulario(habilitado) {
@@ -73,7 +53,8 @@ form.addEventListener('submit', async (e) => {
     contador.hidden = true;
     mostrarMensaje(mensaje, resp.mensaje, 'ok');
     habilitarFormulario(false);
-    // Fase 4: aquí se redirige a resp.siguiente (configurar TOTP o ingresar el código)
+    // Primer login -> mfa-configurar.html | logins siguientes -> mfa-codigo.html
+    setTimeout(() => (location.href = resp.siguiente), 900);
     return;
   }
 
@@ -82,7 +63,10 @@ form.addEventListener('submit', async (e) => {
   // 423 = cuenta bloqueada
   if (status === 423) {
     mostrarMensaje(mensaje, resp.error);
-    if (resp.intentos && resp.intentos.segundosBloqueo > 0) bloquear(resp.intentos.segundosBloqueo);
+    if (resp.intentos && resp.intentos.segundosBloqueo > 0) {
+      contador.hidden = false; // también se muestra si el bloqueo vino del MFA
+      bloquear(resp.intentos.segundosBloqueo);
+    }
     return;
   }
 

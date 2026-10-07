@@ -693,7 +693,251 @@ select {
   text-align: center;
 }
 
-/* ---------- 11. Animaciones ---------- */
+/* Variante de ancho medio (panel del usuario) */
+.escena--media {
+  max-width: 560px;
+}
+
+/* Grupo de píldoras (rol, tienda, MFA) */
+.pildoras {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--esp-2);
+  margin-top: var(--esp-4);
+}
+.pildora .icono {
+  width: 14px;
+  height: 14px;
+  color: var(--color-acento);
+}
+.pildora--ok {
+  color: var(--color-exito);
+  background: var(--color-exito-fondo);
+  border-color: var(--color-exito-borde);
+}
+.pildora--ok .icono {
+  color: var(--color-exito);
+}
+.cabecera .centrado {
+  margin-top: var(--esp-3);
+}
+
+/* ---------- 11. MFA: pasos, QR y clave manual ---------- */
+.pasos {
+  display: grid;
+  gap: var(--esp-3);
+  margin: 0 0 var(--esp-4);
+  padding: 0;
+  list-style: none;
+}
+.pasos li {
+  display: flex;
+  gap: var(--esp-3);
+  align-items: flex-start;
+}
+.pasos strong {
+  display: block;
+  font-size: var(--texto-sm);
+  font-weight: 600;
+}
+.pasos p {
+  font-size: var(--texto-xs);
+  color: var(--color-texto-suave);
+}
+/* Número del paso dentro de un círculo con el degradado de la marca */
+.paso-numero {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  font-size: var(--texto-xs);
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-acento), var(--color-violeta));
+  border-radius: 50%;
+}
+
+/* Marco blanco del QR (fondo blanco para que la cámara lo lea bien) */
+.qr-caja {
+  display: grid;
+  place-items: center;
+  width: 232px;
+  height: 232px;
+  margin: 0 auto var(--esp-4);
+  padding: var(--esp-3);
+  background: #fff;
+  border: 1px solid var(--color-borde-campo);
+  border-radius: var(--radio-md);
+  box-shadow: 0 10px 30px -14px rgba(49, 46, 129, 0.35);
+}
+.qr-caja img {
+  display: block;
+  width: 200px;
+  height: 200px;
+  animation: aparecer var(--duracion) var(--curva);
+}
+/* Rectángulo animado mientras se genera el QR */
+.qr-esqueleto {
+  width: 200px;
+  height: 200px;
+  border-radius: var(--radio-sm);
+  background: linear-gradient(90deg, #eef2ff 25%, #f8fafc 50%, #eef2ff 75%);
+  background-size: 200% 100%;
+  animation: brillo 1.4s ease-in-out infinite;
+}
+
+/* Desplegable con la clave para ingresarla a mano */
+.clave-manual {
+  margin-bottom: var(--esp-5);
+  font-size: var(--texto-sm);
+}
+.clave-manual summary {
+  text-align: center;
+  color: var(--color-acento);
+  font-weight: 500;
+  cursor: pointer;
+}
+.clave-manual summary:focus-visible {
+  outline: 2px solid var(--color-acento);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.secreto-fila {
+  display: flex;
+  gap: var(--esp-2);
+  align-items: center;
+  margin-top: var(--esp-3);
+}
+.secreto {
+  flex: 1;
+  padding: 10px 12px;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: var(--texto-sm);
+  letter-spacing: 0.06em;
+  word-break: break-all;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--color-borde-campo);
+  border-radius: var(--radio-sm);
+}
+.nota {
+  margin-top: var(--esp-2);
+  font-size: var(--texto-xs);
+  color: var(--color-texto-suave);
+}
+
+/* Botón cuadrado solo con icono (copiar) */
+.btn-icono {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  color: var(--color-acento);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--color-borde-campo);
+  border-radius: var(--radio-sm);
+  cursor: pointer;
+  transition: background-color var(--duracion-rapida) ease, border-color var(--duracion-rapida) ease;
+}
+.btn-icono:hover {
+  background: #fff;
+  border-color: var(--color-borde-hover);
+}
+.btn-icono:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+.btn-icono.copiado {
+  color: #fff;
+  background: var(--color-exito);
+  border-color: var(--color-exito);
+}
+
+/* Barra de tiempo del código TOTP (30 segundos) */
+.ciclo-totp {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  margin-top: var(--esp-2);
+  font-size: var(--texto-xs);
+  color: var(--color-texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+.ciclo-barra {
+  flex: 1;
+  height: 4px;
+  overflow: hidden;
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: var(--radio-total);
+}
+.ciclo-barra span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-turquesa), var(--color-acento));
+  border-radius: inherit;
+  transition: width 1s linear;
+}
+
+/* ---------- 12. Panel: datos del usuario y token ---------- */
+.titulo-seccion {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  margin: var(--esp-5) 0 var(--esp-3);
+  font-size: var(--texto-sm);
+  font-weight: 600;
+  color: var(--color-texto-2);
+}
+.titulo-seccion .icono {
+  color: var(--color-acento);
+}
+/* Lista de datos en dos columnas: etiqueta | valor */
+.datos {
+  margin: 0;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--color-borde-campo);
+  border-radius: var(--radio-md);
+}
+.datos > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 40%) 1fr;
+  gap: var(--esp-3);
+  padding: 10px var(--esp-4);
+  font-size: var(--texto-sm);
+}
+.datos > div + div {
+  border-top: 1px solid var(--color-borde-campo);
+}
+.datos dt {
+  color: var(--color-texto-suave);
+}
+.datos dd {
+  margin: 0;
+  font-weight: 500;
+  word-break: break-word;
+}
+.estado-ok {
+  color: var(--color-exito);
+}
+/* Vista parcial del token JWT */
+.token {
+  margin-top: var(--esp-3);
+  padding: var(--esp-3) var(--esp-4);
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px dashed var(--color-borde-campo);
+  border-radius: var(--radio-md);
+}
+.token code {
+  display: block;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: var(--texto-xs);
+  color: var(--color-texto-2);
+  word-break: break-all;
+}
+
+/* ---------- 13. Animaciones ---------- */
 @keyframes entrada {
   from {
     opacity: 0;
@@ -730,8 +974,12 @@ select {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.55; }
 }
+@keyframes brillo {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
-/* ---------- 12. Responsivo (celulares) ---------- */
+/* ---------- 14. Responsivo (celulares) ---------- */
 @media (max-width: 480px) {
   body {
     padding: var(--esp-5) var(--esp-4);
@@ -743,12 +991,16 @@ select {
   .reglas {
     grid-template-columns: 1fr;
   }
+  .datos > div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
   :root {
     --blur-blob: 55px;
   }
 }
 
-/* ---------- 13. Accesibilidad: sin animaciones si el usuario lo pide ---------- */
+/* ---------- 15. Accesibilidad: sin animaciones si el usuario lo pide ---------- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechStore - Código de verificación</title>
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body data-pagina="mfa-codigo">
+  <!-- Fondo decorativo con formas difuminadas -->
+  <div class="fondo" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <main class="escena">
+    <div class="flotante">
+      <section class="card">
+        <header class="cabecera">
+          <img class="logo" src="/img/logo.svg" alt="">
+          <h1>Verificación en dos pasos</h1>
+          <p class="subtitulo">Abre Google Authenticator e ingresa el código de TechStore.</p>
+          <p class="centrado"><span id="email-usuario" class="pildora">&nbsp;</span></p>
+        </header>
+
+        <form id="form-mfa" novalidate>
+          <div class="campo">
+            <label for="codigo">Código de 6 dígitos</label>
+            <div class="control">
+              <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#celular"/></svg>
+              <input id="codigo" name="codigo" class="input-codigo" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000" required>
+            </div>
+            <!-- Tiempo que le queda al código actual (TOTP cambia cada 30 s) -->
+            <div class="ciclo-totp" aria-hidden="true">
+              <span class="ciclo-barra"><span id="ciclo-progreso"></span></span>
+              <span id="ciclo-texto">Nuevo código en 30 s</span>
+            </div>
+          </div>
+
+          <!-- Contador visible de intentos de MFA (máximo 3) -->
+          <div id="contador" class="contador" aria-live="polite" hidden>
+            <div class="contador-cabecera">
+              <span>Códigos incorrectos</span>
+              <strong id="contador-texto">0 de 3</strong>
+            </div>
+            <div id="contador-barra" class="contador-barra" aria-hidden="true"></div>
+            <p id="contador-ayuda" class="contador-ayuda"></p>
+          </div>
+
+          <button type="submit" class="btn btn-primario">
+            <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#escudo"/></svg>
+            Verificar
+          </button>
+        </form>
+        <div id="mensaje" class="msg" role="status" aria-live="polite" hidden></div>
+        <p class="enlaces"><a href="/login.html" id="cancelar">Cancelar e iniciar sesión de nuevo</a></p>
+      </section>
+    </div>
+    <p class="pie">TechStore · Seguridad en la nube con AWS</p>
+  </main>
+
+  <script src="/js/comun.js"></script>
+  <script src="/js/mfa.js"></script>
+</body>
+</html>
