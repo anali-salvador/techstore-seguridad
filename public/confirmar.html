@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechStore - Verificar cuenta</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <main class="card">
+    <h1>Verificar cuenta</h1>
+    <p>Ingresa el código de 6 dígitos que Cognito envió a tu correo.</p>
+    <form id="form-confirmar" novalidate>
+      <label for="email">Correo electrónico</label>
+      <input id="email" name="email" type="email" required>
+
+      <label for="codigo">Código de verificación</label>
+      <input id="codigo" name="codigo" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required>
+
+      <button type="submit">Verificar</button>
+    </form>
+    <div id="mensaje" class="msg" hidden></div>
+    <p class="enlaces">
+      ¿No llegó el código? <a href="#" id="reenviar">Reenviar código</a><br>
+      <a href="/login.html">Ir a iniciar sesión</a>
+    </p>
+  </main>
+  <script src="/js/comun.js"></script>
+  <script src="/js/confirmar.js"></script>
+</body>
+</html>

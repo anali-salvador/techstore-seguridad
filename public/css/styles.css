@@ -39,3 +39,11 @@ button:hover { background: #1e40af; }
 .msg { margin-top: 12px; padding: 10px; border-radius: 6px; }
 .msg.error { background: #fee2e2; color: #991b1b; }
 .msg.ok { background: #dcfce7; color: #166534; }
+
+/* Reglas de contraseña: gris si falta, verde si se cumple */
+.reglas { list-style: none; padding: 0; margin: 8px 0 0; font-size: 0.9rem; color: #64748b; }
+.reglas li::before { content: "✗ "; color: #dc2626; }
+.reglas li.ok { color: #166534; }
+.reglas li.ok::before { content: "✓ "; color: #16a34a; }
+.enlaces { margin-top: 16px; text-align: center; font-size: 0.95rem; }
+a { color: #1e40af; }
