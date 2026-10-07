@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechStore - Iniciar sesión</title>
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <!-- Fondo decorativo con formas difuminadas -->
+  <div class="fondo" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <main class="escena">
+    <div class="flotante">
+      <section class="card">
+        <header class="cabecera">
+          <img class="logo" src="/img/logo.svg" alt="">
+          <h1>Iniciar sesión</h1>
+          <p class="subtitulo">Accede al inventario de tu tienda.</p>
+        </header>
+
+        <form id="form-login" novalidate>
+          <div class="campo">
+            <label for="email">Correo electrónico</label>
+            <div class="control">
+              <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#correo"/></svg>
+              <input id="email" name="email" type="email" autocomplete="username" placeholder="tu@correo.com" required>
+            </div>
+          </div>
+
+          <div class="campo">
+            <label for="password">Contraseña</label>
+            <div class="control">
+              <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#candado"/></svg>
+              <input id="password" name="password" type="password" autocomplete="current-password" required>
+            </div>
+          </div>
+
+          <!-- Contador visible de intentos fallidos (aparece tras el primer fallo) -->
+          <div id="contador" class="contador" aria-live="polite" hidden>
+            <div class="contador-cabecera">
+              <span>Intentos fallidos</span>
+              <strong id="contador-texto">0 de 5</strong>
+            </div>
+            <div id="contador-barra" class="contador-barra" aria-hidden="true"></div>
+            <p id="contador-ayuda" class="contador-ayuda"></p>
+          </div>
+
+          <button type="submit" class="btn btn-primario">
+            Ingresar
+            <svg class="icono icono-flecha" aria-hidden="true"><use href="/img/iconos.svg#flecha"/></svg>
+          </button>
+        </form>
+        <div id="mensaje" class="msg" role="status" aria-live="polite" hidden></div>
+        <p class="enlaces">¿No tienes cuenta? <a href="/registro.html">Regístrate</a></p>
+      </section>
+    </div>
+    <p class="pie">TechStore · Seguridad en la nube con AWS</p>
+  </main>
+
+  <script src="/js/comun.js"></script>
+  <script src="/js/login.js"></script>
+</body>
+</html>

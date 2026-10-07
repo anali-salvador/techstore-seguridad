@@ -35,6 +35,9 @@
   --color-error: #b91c1c;
   --color-error-fondo: rgba(220, 38, 38, 0.08);
   --color-error-borde: rgba(220, 38, 38, 0.25);
+  --color-aviso: #b45309;
+  --color-aviso-fondo: rgba(245, 158, 11, 0.1);
+  --color-aviso-borde: rgba(245, 158, 11, 0.32);
 
   /* Fondo degradado (tonos claros de azul, violeta y turquesa) */
   --fondo-1: #e0e7ff;
@@ -340,6 +343,13 @@ select:focus-visible {
   box-shadow: var(--anillo-foco);
 }
 
+/* Campos deshabilitados (por ejemplo, durante el bloqueo) */
+input:disabled,
+select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 /* Select con flecha propia */
 select {
   padding-right: 40px;
@@ -532,7 +542,81 @@ select {
   --icono-msg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E");
 }
 
-/* ---------- 9. Componentes extra ---------- */
+.msg.aviso {
+  color: var(--color-aviso);
+  background: var(--color-aviso-fondo);
+  border-color: var(--color-aviso-borde);
+  --icono-msg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3'/%3E%3Cpath d='M12 9v4M12 17h.01'/%3E%3C/svg%3E");
+}
+
+/* ---------- 9. Contador de intentos fallidos ---------- */
+.contador {
+  margin-top: var(--esp-4);
+  padding: var(--esp-3) var(--esp-4);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--color-borde-campo);
+  border-radius: var(--radio-md);
+  animation: aparecer var(--duracion) var(--curva);
+}
+.contador-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: var(--texto-sm);
+  color: var(--color-texto-2);
+}
+.contador-cabecera strong {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-error);
+}
+/* Barra con un segmento por intento: los usados se pintan de rojo */
+.contador-barra {
+  display: flex;
+  gap: 6px;
+  margin-top: var(--esp-2);
+}
+.segmento {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radio-total);
+  background: rgba(15, 23, 42, 0.1);
+  transition: background-color var(--duracion) var(--curva), transform var(--duracion) var(--curva);
+}
+.segmento.usado {
+  background: var(--color-error);
+}
+/* Cuando queda 1 intento o menos, el contador "pulsa" para llamar la atención */
+.contador.critico {
+  border-color: var(--color-error-borde);
+  background: var(--color-error-fondo);
+}
+.contador.critico .segmento.usado {
+  animation: pulso 1.2s ease-in-out infinite;
+}
+.contador-ayuda {
+  margin-top: var(--esp-2);
+  font-size: var(--texto-xs);
+  color: var(--color-texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+.contador-ayuda:empty {
+  display: none;
+}
+
+/* Botón bloqueado (no es carga): sin spinner, con aspecto apagado */
+.btn.bloqueado:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: none;
+}
+.btn.bloqueado:disabled::before {
+  content: none;
+}
+.btn.bloqueado:disabled .icono {
+  display: inline;
+}
+
+/* ---------- 10. Componentes extra ---------- */
 /* Enlaces al pie de la tarjeta */
 .enlaces {
   margin-top: var(--esp-5);
@@ -609,7 +693,7 @@ select {
   text-align: center;
 }
 
-/* ---------- 10. Animaciones ---------- */
+/* ---------- 11. Animaciones ---------- */
 @keyframes entrada {
   from {
     opacity: 0;
@@ -642,8 +726,12 @@ select {
   70% { box-shadow: 0 0 0 8px rgba(79, 70, 229, 0); }
   100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
 }
+@keyframes pulso {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
 
-/* ---------- 11. Responsivo (celulares) ---------- */
+/* ---------- 12. Responsivo (celulares) ---------- */
 @media (max-width: 480px) {
   body {
     padding: var(--esp-5) var(--esp-4);
@@ -660,7 +748,7 @@ select {
   }
 }
 
-/* ---------- 12. Accesibilidad: sin animaciones si el usuario lo pide ---------- */
+/* ---------- 13. Accesibilidad: sin animaciones si el usuario lo pide ---------- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
