@@ -278,6 +278,11 @@ function cargarPruebas() {
   if (usuario.alcance === 'propia' && otraTienda) {
     pruebas.push(['', `Ver productos de ${nombreTienda(otraTienda)}`, 'GET', `/api/productos?tienda=${otraTienda}`]);
   }
+  // Gerente: SÍ puede eliminar en su tienda, pero NO en otra. Se usa un producto inexistente:
+  // el servidor revisa la tienda antes de tocar DynamoDB, así que responde 403 sin borrar nada.
+  if (usuario.alcance === 'propia' && puede('productos:eliminar') && otraTienda) {
+    pruebas.push(['', `Eliminar un producto de ${nombreTienda(otraTienda)}`, 'DELETE', `/api/productos/${otraTienda}/prueba-inexistente`]);
+  }
 
   if (!pruebas.length) return;
   document.getElementById('seccion-pruebas').hidden = false;
