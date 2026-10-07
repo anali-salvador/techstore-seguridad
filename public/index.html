@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechStore - Inicio</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <main class="card">
+    <h1>TechStore</h1>
+    <p>Sistema de gestión de inventario seguro en AWS.</p>
+    <p id="estado">Verificando servidor...</p>
+  </main>
+  <script>
+    // Llama a /api/health para comprobar que el backend responde
+    fetch('/api/health')
+      .then((r) => r.json())
+      .then((d) => (document.getElementById('estado').textContent = 'Servidor OK - ' + d.hora))
+      .catch(() => (document.getElementById('estado').textContent = 'Servidor no disponible'));
+  </script>
+</body>
+</html>
