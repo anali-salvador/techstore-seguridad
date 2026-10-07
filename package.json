@@ -1,0 +1,30 @@
+{
+  "name": "techstore-seguridad",
+  "version": "1.0.0",
+  "description": "TechStore - Sistema de gestión de inventario con seguridad en AWS (Cognito, MFA TOTP, roles, DynamoDB)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "author": "anali-salvador",
+  "license": "ISC",
+  "private": true,
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.1147.0",
+    "@aws-sdk/client-dynamodb": "^3.1147.0",
+    "@aws-sdk/lib-dynamodb": "^3.1147.0",
+    "aws-jwt-verify": "^5.2.1",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^18.0.6",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "jsonwebtoken": "^9.0.3",
+    "passport": "^0.7.0",
+    "passport-github2": "^0.1.12",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
