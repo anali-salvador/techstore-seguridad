@@ -53,6 +53,7 @@ async function verificarIdToken(token) {
 // Convierte los claims de Cognito a un objeto simple para la app
 function datosUsuario(claims) {
   return {
+    username: claims['cognito:username'], // identificador interno del usuario en Cognito
     email: claims.email,
     nombre: claims.name,
     tienda: claims['custom:tienda'] || null,

@@ -6,6 +6,9 @@ const cookieParser = require('cookie-parser');
 const config = require('./config/env');
 const authRoutes = require('./routes/auth');
 const mfaRoutes = require('./routes/mfa');
+const productosRoutes = require('./routes/productos');
+const reportesRoutes = require('./routes/reportes');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
@@ -35,6 +38,9 @@ app.get('/api/health', (req, res) => {
 // Rutas de la API
 app.use('/api', authRoutes);
 app.use('/api/mfa', mfaRoutes);
+app.use('/api/productos', productosRoutes); // CRUD con permisos por rol y tienda
+app.use('/api/reportes', reportesRoutes);
+app.use('/api/admin', adminRoutes); // solo Administrador
 
 app.listen(config.port, () => {
   console.log(`TechStore escuchando en http://localhost:${config.port}`);

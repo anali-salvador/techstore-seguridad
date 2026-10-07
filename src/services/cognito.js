@@ -9,6 +9,12 @@ const {
   VerifySoftwareTokenCommand,
   RespondToAuthChallengeCommand,
   GlobalSignOutCommand,
+  ListUsersCommand,
+  ListUsersInGroupCommand,
+  AdminListGroupsForUserCommand,
+  AdminRemoveUserFromGroupCommand,
+  AdminEnableUserCommand,
+  AdminDisableUserCommand,
   AdminUpdateUserAttributesCommand,
   AdminAddUserToGroupCommand,
 } = require('@aws-sdk/client-cognito-identity-provider');
@@ -128,6 +134,82 @@ async function cerrarSesionGlobal(accessToken) {
   return cognito.send(new GlobalSignOutCommand({ AccessToken: accessToken }));
 }
 
+// ----- Administración de usuarios (solo con credenciales IAM del servidor) -----
+
+// Lee un atributo de la lista que devuelve Cognito: [{ Name, Value }, ...]
+const atributo = (lista = [], nombre) => (lista.find((a) => a.Name === nombre) || {}).Value;
+
+// Lista todos los usuarios del User Pool con su rol (grupo) y tienda
+async function listarUsuarios(grupos) {
+  // 1) Qué usuarios hay en cada grupo (una llamada por grupo)
+  const rolDe = {};
+  for (const grupo of grupos) {
+    let token;
+    do {
+      const r = await cognito.send(
+        new ListUsersInGroupCommand({ UserPoolId: userPoolId, GroupName: grupo, NextToken: token })
+      );
+      for (const u of r.Users) if (!rolDe[u.Username]) rolDe[u.Username] = grupo; // grupos en orden de prioridad
+      token = r.NextToken;
+    } while (token);
+  }
+
+  // 2) Todos los usuarios con sus atributos
+  const usuarios = [];
+  let pagina;
+  do {
+    const r = await cognito.send(new ListUsersCommand({ UserPoolId: userPoolId, PaginationToken: pagina }));
+    for (const u of r.Users) {
+      usuarios.push({
+        username: u.Username,
+        email: atributo(u.Attributes, 'email'),
+        nombre: atributo(u.Attributes, 'name'),
+        tienda: atributo(u.Attributes, 'custom:tienda') || null,
+        rol: rolDe[u.Username] || null,
+        estado: u.UserStatus, // CONFIRMED, UNCONFIRMED, EXTERNAL_PROVIDER...
+        habilitado: u.Enabled,
+        creado: u.UserCreateDate,
+      });
+    }
+    pagina = r.PaginationToken;
+  } while (pagina);
+  return usuarios;
+}
+
+// Deja al usuario en UN solo grupo: lo saca de los demás y lo agrega al nuevo
+async function cambiarRol(username, nuevoRol) {
+  const actuales = await cognito.send(
+    new AdminListGroupsForUserCommand({ UserPoolId: userPoolId, Username: username })
+  );
+  for (const g of actuales.Groups) {
+    if (g.GroupName !== nuevoRol) {
+      await cognito.send(
+        new AdminRemoveUserFromGroupCommand({ UserPoolId: userPoolId, Username: username, GroupName: g.GroupName })
+      );
+    }
+  }
+  await cognito.send(
+    new AdminAddUserToGroupCommand({ UserPoolId: userPoolId, Username: username, GroupName: nuevoRol })
+  );
+}
+
+// Cambia la tienda (custom:tienda) de un usuario
+async function cambiarTienda(username, tienda) {
+  await cognito.send(
+    new AdminUpdateUserAttributesCommand({
+      UserPoolId: userPoolId,
+      Username: username,
+      UserAttributes: [{ Name: 'custom:tienda', Value: tienda }],
+    })
+  );
+}
+
+// Habilita o deshabilita la cuenta (un usuario deshabilitado no puede iniciar sesión)
+async function cambiarEstado(username, habilitado) {
+  const Comando = habilitado ? AdminEnableUserCommand : AdminDisableUserCommand;
+  await cognito.send(new Comando({ UserPoolId: userPoolId, Username: username }));
+}
+
 // Traduce los errores de Cognito a mensajes en español para el usuario
 function traducirError(err) {
   const mensajes = {
@@ -156,6 +238,10 @@ module.exports = {
   completarConfiguracionMfa,
   responderCodigoMfa,
   cerrarSesionGlobal,
+  listarUsuarios,
+  cambiarRol,
+  cambiarTienda,
+  cambiarEstado,
   traducirError,
   GRUPO_POR_DEFECTO,
 };

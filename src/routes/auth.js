@@ -5,6 +5,7 @@ const { validarPassword, validarEmail } = require('../services/validaciones');
 const cognito = require('../services/cognito');
 const { intentosLogin, intentosMfa } = require('../services/contadores');
 const jwt = require('../services/jwt');
+const { autenticar } = require('../middleware/autenticacion');
 
 const router = express.Router();
 
@@ -171,20 +172,14 @@ router.post('/auth/login', async (req, res) => {
 });
 
 // GET /api/auth/sesion -> datos del usuario según su JWT (verificado)
-router.get('/auth/sesion', async (req, res) => {
-  const token = req.cookies[jwt.COOKIE_ID];
-  if (!token) return res.status(401).json({ error: 'No has iniciado sesión.' });
-  try {
-    const claims = await jwt.verificarIdToken(token);
-    res.json({
-      usuario: jwt.datosUsuario(claims),
-      // Solo una vista parcial del token, como evidencia (el token completo nunca sale de la cookie)
-      token: { vista: `${token.slice(0, 32)}…${token.slice(-12)}`, longitud: token.length },
-    });
-  } catch (err) {
-    jwt.borrarTokens(res);
-    res.status(401).json({ error: 'Tu sesión no es válida o expiró. Inicia sesión de nuevo.' });
-  }
+// (incluye rol, alcance y permisos para que el dashboard muestre los botones correctos)
+router.get('/auth/sesion', autenticar, (req, res) => {
+  const token = req.cookies[jwt.COOKIE_ID] || '';
+  res.json({
+    usuario: req.usuario,
+    // Solo una vista parcial del token, como evidencia (el token completo nunca sale de la cookie)
+    token: { vista: `${token.slice(0, 32)}…${token.slice(-12)}`, longitud: token.length },
+  });
 });
 
 // POST /api/auth/logout -> cierra la sesión en Cognito y en la app
