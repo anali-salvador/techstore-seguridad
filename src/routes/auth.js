@@ -5,6 +5,7 @@ const { validarPassword, validarEmail } = require('../services/validaciones');
 const cognito = require('../services/cognito');
 const { intentosLogin, intentosMfa } = require('../services/contadores');
 const jwt = require('../services/jwt');
+const config = require('../config/env');
 const { autenticar } = require('../middleware/autenticacion');
 
 const router = express.Router();
@@ -189,8 +190,25 @@ router.post('/auth/logout', async (req, res) => {
     // Invalida los tokens en Cognito; si ya expiraron, igual seguimos cerrando sesión
     await cognito.cerrarSesionGlobal(accessToken).catch((err) => console.error('[logout]', err.name));
   }
+
+  // Si entró con Google, también se cierra la sesión del Hosted UI de Cognito
+  // (si no, el próximo "Continuar con Google" entraría sin preguntar)
+  let siguiente = '/login.html';
+  const origen = await jwt
+    .verificarIdToken(req.cookies[jwt.COOKIE_ID] || '')
+    .then((claims) => jwt.datosUsuario(claims).origen)
+    .catch(() => null);
+  if (origen === 'google' && config.cognito.domain) {
+    const url = new URL('/logout', config.cognito.domain);
+    url.search = new URLSearchParams({
+      client_id: config.cognito.clientId,
+      logout_uri: new URL('/login.html', config.cognito.redirectUri).toString(),
+    }).toString();
+    siguiente = url.toString();
+  }
+
   jwt.borrarTokens(res);
-  req.session.destroy(() => res.json({ mensaje: 'Sesión cerrada.' }));
+  req.session.destroy(() => res.json({ mensaje: 'Sesión cerrada.', siguiente }));
 });
 
 module.exports = router;

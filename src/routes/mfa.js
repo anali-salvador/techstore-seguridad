@@ -6,6 +6,8 @@ const QRCode = require('qrcode');
 const cognito = require('../services/cognito');
 const jwt = require('../services/jwt');
 const { intentosMfa } = require('../services/contadores');
+const totp = require('../services/totp');
+const { cifrar, descifrar } = require('../services/cifrado');
 
 const router = express.Router();
 
@@ -71,6 +73,17 @@ async function completarLogin(req, res, resultado) {
   res.json({ mensaje: 'Verificación correcta. Bienvenido a TechStore.', siguiente: '/dashboard.html' });
 }
 
+// ---------- MFA de los logins sociales (Google y GitHub) ----------
+// Cognito no aplica su MFA a usuarios federados, así que la app usa su propio TOTP
+// (services/totp.js). La clave se guarda cifrada en Cognito (custom:mfa_social).
+const esSocial = (mfa) => mfa.tipo === 'social';
+
+// Tokens que se entregan al completar un login social
+function tokensSociales(mfa) {
+  // GitHub: JWT propio firmado por la app | Google: los tokens de Cognito guardados en la sesión
+  return mfa.proveedor === 'github' ? jwt.firmarTokenApp(mfa.usuarioApp) : mfa.tokens;
+}
+
 // GET /api/mfa/estado -> qué reto está pendiente y cómo va el contador
 router.get('/estado', (req, res) => {
   const { email, reto } = req.session.mfa;
@@ -84,6 +97,13 @@ router.post('/configurar/iniciar', async (req, res) => {
 
   // Si la página se recarga, se reutiliza el mismo QR (no se pide otra clave a Cognito)
   if (mfa.qr) return res.json({ qr: mfa.qr, secreto: mfa.secreto, intentos: intentosMfa.estado(mfa.email) });
+
+  // Login social: la app genera la clave (todavía no se guarda: solo cuando el primer código sea correcto)
+  if (esSocial(mfa)) {
+    mfa.secreto = totp.generarSecreto();
+    mfa.qr = await QRCode.toDataURL(totp.uriOtpauth(mfa.secreto, mfa.email, 'TechStore Social'), { margin: 1, width: 220 });
+    return res.json({ qr: mfa.qr, secreto: mfa.secreto, intentos: intentosMfa.estado(mfa.email) });
+  }
 
   try {
     const r = await cognito.asociarTotp(mfa.cognitoSession);
@@ -113,6 +133,15 @@ router.post('/configurar/verificar', async (req, res) => {
   if (!codigoValido(codigo)) return res.status(400).json({ error: 'El código debe tener 6 dígitos.' });
 
   try {
+    if (esSocial(mfa)) {
+      if (!totp.verificarCodigo(mfa.secreto, codigo, mfa.username)) {
+        return manejarErrorCodigo(req, res, { name: 'CodeMismatchException', message: 'TOTP social' });
+      }
+      // Primer código correcto: recién ahora se guarda la clave, cifrada, en Cognito
+      await cognito.guardarSecretoMfaSocial(mfa.username, cifrar(mfa.secreto));
+      return await completarLogin(req, res, tokensSociales(mfa));
+    }
+
     const verificado = await cognito.verificarTotp(mfa.cognitoSession, codigo);
     if (verificado.Status !== 'SUCCESS') {
       return manejarErrorCodigo(req, res, { name: 'CodeMismatchException', message: verificado.Status });
@@ -132,6 +161,13 @@ router.post('/verificar', async (req, res) => {
   if (!codigoValido(codigo)) return res.status(400).json({ error: 'El código debe tener 6 dígitos.' });
 
   try {
+    if (esSocial(mfa)) {
+      if (!totp.verificarCodigo(descifrar(mfa.secretoCifrado), codigo, mfa.username)) {
+        return manejarErrorCodigo(req, res, { name: 'CodeMismatchException', message: 'TOTP social' });
+      }
+      return await completarLogin(req, res, tokensSociales(mfa));
+    }
+
     const r = await cognito.responderCodigoMfa(mfa.cognitoSession, mfa.email, codigo);
     await completarLogin(req, res, r.AuthenticationResult);
   } catch (err) {
