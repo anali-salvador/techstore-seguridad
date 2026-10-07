@@ -23,6 +23,7 @@ const {
   AdminAddUserToGroupCommand,
 } = require('@aws-sdk/client-cognito-identity-provider');
 const config = require('../config/env');
+const { PRIORIDAD } = require('../config/permisos'); // los 4 grupos que son roles
 
 // El cliente toma las credenciales IAM del .env (AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY)
 const cognito = new CognitoIdentityProviderClient({ region: config.aws.region });
@@ -252,13 +253,16 @@ async function buscarPorEmail(email) {
 // Si el usuario no tiene rol o tienda, le asigna los valores por defecto
 // (igual que el registro normal: EmpleadoVentas y lima-centro)
 async function asignarValoresPorDefecto(usuario, rol, tienda) {
+  // Solo cuentan los 4 grupos de ROL. Los usuarios de Google ya vienen en el grupo automático
+  // "<pool>_Google", que NO es un rol: si se contara, nunca recibirían EmpleadoVentas.
+  const tieneRol = usuario.grupos.some((g) => PRIORIDAD.includes(g));
   if (!usuario.tienda) await cambiarTienda(usuario.username, tienda);
-  if (!usuario.grupos.length) {
+  if (!tieneRol) {
     await cognito.send(
       new AdminAddUserToGroupCommand({ UserPoolId: userPoolId, Username: usuario.username, GroupName: rol })
     );
   }
-  return !usuario.tienda || !usuario.grupos.length; // true = hubo cambios
+  return !usuario.tienda || !tieneRol; // true = hubo cambios (hay que pedir un token nuevo)
 }
 
 // Crea en Cognito el registro de un usuario de GitHub (para que el Administrador
