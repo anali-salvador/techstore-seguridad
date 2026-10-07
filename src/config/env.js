@@ -27,7 +27,14 @@ const config = {
     callbackUrl: process.env.GITHUB_CALLBACK_URL,
   },
 
+  // Firma del JWT propio de la app (usuarios que entran con GitHub, que no es proveedor de Cognito)
   appJwtSecret: process.env.APP_JWT_SECRET,
+  // Clave AES-256 (64 hex) para cifrar la clave TOTP de los usuarios sociales
+  mfaSocialClave: process.env.MFA_SOCIAL_CLAVE,
+
+  // Valores por defecto de los usuarios nuevos (registro normal y login social)
+  rolPorDefecto: 'EmpleadoVentas',
+  tiendaPorDefecto: 'lima-centro',
 
   // Límites del contador visible de intentos
   maxLoginAttempts: Number(process.env.MAX_LOGIN_ATTEMPTS) || 5,
@@ -40,6 +47,13 @@ const requeridas = ['SESSION_SECRET', 'COGNITO_USER_POOL_ID', 'COGNITO_CLIENT_ID
 const faltantes = requeridas.filter((v) => !process.env[v]);
 if (faltantes.length) {
   console.warn(`[config] Faltan variables en .env: ${faltantes.join(', ')}`);
+}
+// Login social: se avisa qué falta (solo nombres de variables, nunca valores)
+const socialFaltantes = ['GITHUB_CLIENT_ID', 'GITHUB_CLIENT_SECRET', 'APP_JWT_SECRET', 'MFA_SOCIAL_CLAVE', 'COGNITO_DOMAIN'].filter(
+  (v) => !process.env[v]
+);
+if (socialFaltantes.length) {
+  console.warn(`[config] Login social incompleto, faltan: ${socialFaltantes.join(', ')}`);
 }
 
 module.exports = config;
