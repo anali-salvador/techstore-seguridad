@@ -47,7 +47,10 @@ async function verificarCognito() {
   console.log('\n— Cognito —');
   const grupos = (await cognito.send(new C.ListGroupsCommand({ UserPoolId: POOL }))).Groups.map((g) => g.GroupName);
   const faltan = PRIORIDAD.filter((g) => !grupos.includes(g));
-  resultado(!faltan.length, 'Grupos (roles)', faltan.length ? `faltan ${faltan.join(', ')}` : grupos.join(', '));
+  resultado(!faltan.length, 'Grupos (roles)', faltan.length ? `faltan ${faltan.join(', ')}` : PRIORIDAD.join(', '));
+  // Cognito crea solo un grupo '<pool>_Google' para los usuarios federados: no es un rol de la app
+  const automaticos = grupos.filter((g) => !PRIORIDAD.includes(g));
+  if (automaticos.length) console.log(`ℹ️  Grupos automáticos de Cognito (no son roles): ${automaticos.join(', ')}`);
 
   for (const rol of PRIORIDAD) {
     const r = await cognito.send(new C.ListUsersInGroupCommand({ UserPoolId: POOL, GroupName: rol }));

@@ -482,6 +482,8 @@ GitHub **no es un proveedor que Cognito acepte** (no es OpenID Connect). Por eso
   queda **sin rol**, sin ningún permiso. Un administrador puede borrarlo desde la consola.
 - **Dos entradas en Google Authenticator:** un usuario que entra con correo y contraseña **y** también con
   Google o GitHub tiene dos claves TOTP: "TechStore" (Cognito) y "TechStore Social" (app).
+- **Grupo automático de Google:** al agregar Google como proveedor, Cognito crea solo el grupo
+  `<pool>_Google` para los usuarios federados. No es un rol: la app lo ignora y el panel de usuarios nunca lo quita.
 - **Sesiones:** se guardan en memoria (`MemoryStore`), lo que solo es adecuado para desarrollo.
 - **HTTPS:** en local se usa HTTP; en producción hace falta HTTPS (las cookies ya se marcan `Secure` con
   `NODE_ENV=production`).
