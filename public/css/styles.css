@@ -1375,7 +1375,6 @@ select {
 /* Botones de login social (Google / GitHub) con efecto cristal */
 .botones-sociales {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: var(--esp-3);
 }
 .btn-social {
@@ -1466,8 +1465,7 @@ select {
   .escena--ancha .card {
     padding: var(--esp-5) var(--esp-4);
   }
-  .herramientas,
-  .botones-sociales {
+  .herramientas {
     grid-template-columns: 1fr;
   }
   :root {
