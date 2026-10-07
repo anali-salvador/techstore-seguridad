@@ -4,18 +4,63 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TechStore - Inicio</title>
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-  <main class="card">
-    <h1>TechStore</h1>
-    <p>Sistema de gestión de inventario seguro en AWS.</p>
-    <p id="estado">Verificando servidor...</p>
-    <p class="enlaces">
-      <a href="/registro.html">Crear cuenta</a> ·
-      <a href="/login.html">Iniciar sesión</a>
-    </p>
+  <!-- Fondo decorativo con formas difuminadas -->
+  <div class="fondo" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <main class="escena">
+    <div class="flotante">
+      <section class="card">
+        <header class="cabecera">
+          <img class="logo logo--grande" src="/img/logo.svg" alt="">
+          <h1>TechStore</h1>
+          <p class="subtitulo">Sistema de gestión de inventario seguro en AWS.</p>
+        </header>
+
+        <div class="centrado">
+          <p id="estado" class="pildora pildora--viva" role="status">Verificando servidor...</p>
+        </div>
+
+        <ul class="caracteristicas">
+          <li>
+            <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#nube"/></svg>
+            Autenticación con Amazon Cognito
+          </li>
+          <li>
+            <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#escudo"/></svg>
+            Verificación en dos pasos (MFA TOTP)
+          </li>
+          <li>
+            <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#tienda"/></svg>
+            Permisos por rol y por tienda
+          </li>
+        </ul>
+
+        <div class="acciones">
+          <a class="btn btn-primario" href="/login.html">
+            <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#entrar"/></svg>
+            Iniciar sesión
+          </a>
+          <a class="btn btn-secundario" href="/registro.html">
+            <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#usuario-mas"/></svg>
+            Crear cuenta
+          </a>
+        </div>
+      </section>
+    </div>
+    <p class="pie">TechStore · Seguridad en la nube con AWS</p>
   </main>
+
   <script>
     // Llama a /api/health para comprobar que el backend responde
     fetch('/api/health')

@@ -4,27 +4,61 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TechStore - Verificar cuenta</title>
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-  <main class="card">
-    <h1>Verificar cuenta</h1>
-    <p>Ingresa el código de 6 dígitos que Cognito envió a tu correo.</p>
-    <form id="form-confirmar" novalidate>
-      <label for="email">Correo electrónico</label>
-      <input id="email" name="email" type="email" required>
+  <!-- Fondo decorativo con formas difuminadas -->
+  <div class="fondo" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
 
-      <label for="codigo">Código de verificación</label>
-      <input id="codigo" name="codigo" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required>
+  <main class="escena">
+    <div class="flotante">
+      <section class="card">
+        <header class="cabecera">
+          <img class="logo" src="/img/logo.svg" alt="">
+          <h1>Verificar cuenta</h1>
+          <p class="subtitulo">Ingresa el código de 6 dígitos que Cognito envió a tu correo.</p>
+        </header>
 
-      <button type="submit">Verificar</button>
-    </form>
-    <div id="mensaje" class="msg" hidden></div>
-    <p class="enlaces">
-      ¿No llegó el código? <a href="#" id="reenviar">Reenviar código</a><br>
-      <a href="/login.html">Ir a iniciar sesión</a>
-    </p>
+        <form id="form-confirmar" novalidate>
+          <div class="campo">
+            <label for="email">Correo electrónico</label>
+            <div class="control">
+              <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#correo"/></svg>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="tu@correo.com" required>
+            </div>
+          </div>
+
+          <div class="campo">
+            <label for="codigo">Código de verificación</label>
+            <div class="control">
+              <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#codigo"/></svg>
+              <input id="codigo" name="codigo" class="input-codigo" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primario">
+            <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#escudo"/></svg>
+            Verificar
+          </button>
+        </form>
+        <div id="mensaje" class="msg" role="status" aria-live="polite" hidden></div>
+        <p class="enlaces">
+          ¿No llegó el código? <a href="#" id="reenviar">Reenviar código</a><br>
+          <a href="/login.html">Ir a iniciar sesión</a>
+        </p>
+      </section>
+    </div>
+    <p class="pie">TechStore · Seguridad en la nube con AWS</p>
   </main>
+
   <script src="/js/comun.js"></script>
   <script src="/js/confirmar.js"></script>
 </body>

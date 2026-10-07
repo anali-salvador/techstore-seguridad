@@ -13,7 +13,11 @@ form.addEventListener('submit', async (e) => {
     return mostrarMensaje(mensaje, 'El código debe tener 6 dígitos.');
   }
 
+  // Deshabilita el botón mientras espera (muestra el spinner de carga)
+  const boton = form.querySelector('button');
+  boton.disabled = true;
   const { ok, datos: resp } = await postJSON('/api/auth/confirmar', datos);
+  boton.disabled = false;
   if (!ok) return mostrarMensaje(mensaje, resp.error || 'No se pudo verificar.');
 
   mostrarMensaje(mensaje, resp.mensaje, 'ok');

@@ -4,38 +4,83 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TechStore - Registro</title>
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-  <main class="card">
-    <h1>Crear cuenta</h1>
-    <form id="form-registro" novalidate>
-      <label for="nombre">Nombre completo</label>
-      <input id="nombre" name="nombre" autocomplete="name" required>
+  <!-- Fondo decorativo con formas difuminadas -->
+  <div class="fondo" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
 
-      <label for="email">Correo electrónico</label>
-      <input id="email" name="email" type="email" autocomplete="email" required>
+  <main class="escena">
+    <div class="flotante">
+      <section class="card">
+        <header class="cabecera">
+          <img class="logo" src="/img/logo.svg" alt="">
+          <h1>Crear cuenta</h1>
+          <p class="subtitulo">Regístrate para acceder al inventario de tu tienda.</p>
+        </header>
 
-      <label for="password">Contraseña</label>
-      <input id="password" name="password" type="password" autocomplete="new-password" required>
-      <!-- Lista de reglas que se marcan en vivo mientras se escribe -->
-      <ul id="reglas" class="reglas">
-        <li data-regla="largo">Mínimo 8 caracteres</li>
-        <li data-regla="mayuscula">Una letra mayúscula</li>
-        <li data-regla="numero">Un número</li>
-        <li data-regla="especial">Un carácter especial (!@#$%...)</li>
-      </ul>
+        <form id="form-registro" novalidate>
+          <div class="campo">
+            <label for="nombre">Nombre completo</label>
+            <div class="control">
+              <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#usuario"/></svg>
+              <input id="nombre" name="nombre" autocomplete="name" placeholder="Ana Pérez" required>
+            </div>
+          </div>
 
-      <label for="tienda">Tienda asignada</label>
-      <select id="tienda" name="tienda" required>
-        <option value="">-- Selecciona una tienda --</option>
-      </select>
+          <div class="campo">
+            <label for="email">Correo electrónico</label>
+            <div class="control">
+              <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#correo"/></svg>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="tu@correo.com" required>
+            </div>
+          </div>
 
-      <button type="submit">Registrarme</button>
-    </form>
-    <div id="mensaje" class="msg" hidden></div>
-    <p class="enlaces">¿Ya tienes cuenta? <a href="/login.html">Inicia sesión</a></p>
+          <div class="campo">
+            <label for="password">Contraseña</label>
+            <div class="control">
+              <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#candado"/></svg>
+              <input id="password" name="password" type="password" autocomplete="new-password" aria-describedby="reglas" required>
+            </div>
+            <!-- Lista de reglas que se marcan en vivo mientras se escribe -->
+            <ul id="reglas" class="reglas">
+              <li data-regla="largo">Mínimo 8 caracteres</li>
+              <li data-regla="mayuscula">Una letra mayúscula</li>
+              <li data-regla="numero">Un número</li>
+              <li data-regla="especial">Un carácter especial (!@#$%...)</li>
+            </ul>
+          </div>
+
+          <div class="campo">
+            <label for="tienda">Tienda asignada</label>
+            <div class="control">
+              <svg class="icono" aria-hidden="true"><use href="/img/iconos.svg#tienda"/></svg>
+              <select id="tienda" name="tienda" required>
+                <option value="">-- Selecciona una tienda --</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primario">
+            Registrarme
+            <svg class="icono icono-flecha" aria-hidden="true"><use href="/img/iconos.svg#flecha"/></svg>
+          </button>
+        </form>
+        <div id="mensaje" class="msg" role="status" aria-live="polite" hidden></div>
+        <p class="enlaces">¿Ya tienes cuenta? <a href="/login.html">Inicia sesión</a></p>
+      </section>
+    </div>
+    <p class="pie">TechStore · Seguridad en la nube con AWS</p>
   </main>
+
   <script src="/js/comun.js"></script>
   <script src="/js/registro.js"></script>
 </body>

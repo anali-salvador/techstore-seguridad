@@ -1,49 +1,673 @@
-/* Estilos básicos compartidos por todas las páginas */
-* { box-sizing: border-box; }
-body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background: #f1f4f8;
-  color: #1f2937;
-  margin: 0;
-  padding: 24px 16px;
-}
-.card {
-  max-width: 480px;
-  margin: 40px auto;
-  background: #fff;
-  padding: 24px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-}
-h1 { margin-top: 0; color: #1e3a8a; }
-label { display: block; margin-top: 12px; font-weight: 600; }
-input, select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 4px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-}
-button {
-  margin-top: 16px;
-  width: 100%;
-  padding: 10px;
-  border: 0;
-  border-radius: 6px;
-  background: #1e3a8a;
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
-}
-button:hover { background: #1e40af; }
-.msg { margin-top: 12px; padding: 10px; border-radius: 6px; }
-.msg.error { background: #fee2e2; color: #991b1b; }
-.msg.ok { background: #dcfce7; color: #166534; }
+/* ==========================================================
+   TechStore - Sistema de estilos compartido
+   Estilo minimalista con efecto cristal (glassmorphism).
+   Todos los colores, tamaños y tiempos están en :root.
+   ========================================================== */
 
-/* Reglas de contraseña: gris si falta, verde si se cumple */
-.reglas { list-style: none; padding: 0; margin: 8px 0 0; font-size: 0.9rem; color: #64748b; }
-.reglas li::before { content: "✗ "; color: #dc2626; }
-.reglas li.ok { color: #166534; }
-.reglas li.ok::before { content: "✓ "; color: #16a34a; }
-.enlaces { margin-top: 16px; text-align: center; font-size: 0.95rem; }
-a { color: #1e40af; }
+/* ---------- 1. Variables (cambia aquí la apariencia de todo el sitio) ---------- */
+:root {
+  /* Color de acento principal y colores de la marca */
+  --color-acento: #4f46e5;
+  --color-acento-hover: #4338ca;
+  --color-acento-suave: rgba(79, 70, 229, 0.12);
+  --color-azul: #3b82f6;
+  --color-violeta: #8b5cf6;
+  --color-turquesa: #14b8a6;
+
+  /* Texto */
+  --color-texto: #0f172a;
+  --color-texto-2: #334155;
+  --color-texto-suave: #475569;
+  --color-placeholder: #94a3b8;
+
+  /* Superficies de cristal y bordes finos */
+  --color-vidrio: rgba(255, 255, 255, 0.55);
+  --color-vidrio-solido: rgba(255, 255, 255, 0.88);
+  --color-borde-vidrio: rgba(255, 255, 255, 0.7);
+  --color-campo: rgba(255, 255, 255, 0.7);
+  --color-borde-campo: rgba(15, 23, 42, 0.12);
+  --color-borde-hover: rgba(79, 70, 229, 0.4);
+
+  /* Estados */
+  --color-exito: #15803d;
+  --color-exito-fondo: rgba(22, 163, 74, 0.1);
+  --color-exito-borde: rgba(22, 163, 74, 0.28);
+  --color-error: #b91c1c;
+  --color-error-fondo: rgba(220, 38, 38, 0.08);
+  --color-error-borde: rgba(220, 38, 38, 0.25);
+
+  /* Fondo degradado (tonos claros de azul, violeta y turquesa) */
+  --fondo-1: #e0e7ff;
+  --fondo-2: #f3e8ff;
+  --fondo-3: #ccfbf1;
+  --fondo-4: #dbeafe;
+
+  /* Tipografía */
+  --fuente: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --texto-xs: 0.8125rem;
+  --texto-sm: 0.875rem;
+  --texto-base: 1rem;
+  --texto-lg: 1.125rem;
+  --texto-xl: 1.625rem;
+  --texto-2xl: 2rem;
+
+  /* Espaciados */
+  --esp-1: 4px;
+  --esp-2: 8px;
+  --esp-3: 12px;
+  --esp-4: 16px;
+  --esp-5: 24px;
+  --esp-6: 36px;
+  --esp-7: 48px;
+
+  /* Tamaños */
+  --ancho-card: 440px;
+  --ancho-card-ancha: 1100px;
+  --alto-control: 48px;
+  --tam-icono: 18px;
+
+  /* Bordes redondeados */
+  --radio-sm: 8px;
+  --radio-md: 14px;
+  --radio-lg: 28px;
+  --radio-total: 999px;
+
+  /* Sombras suaves */
+  --sombra-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 24px 60px -18px rgba(49, 46, 129, 0.28);
+  --sombra-card-hover: 0 1px 2px rgba(15, 23, 42, 0.05), 0 34px 70px -18px rgba(49, 46, 129, 0.36);
+  --sombra-boton: 0 10px 24px -10px rgba(79, 70, 229, 0.7);
+  --sombra-boton-hover: 0 14px 30px -10px rgba(79, 70, 229, 0.8);
+  --anillo-foco: 0 0 0 4px rgba(79, 70, 229, 0.22);
+
+  /* Efecto cristal */
+  --blur-vidrio: 20px;
+  --blur-blob: 70px;
+
+  /* Movimiento */
+  --curva: cubic-bezier(0.22, 1, 0.36, 1);
+  --duracion-rapida: 0.18s;
+  --duracion: 0.35s;
+  --duracion-entrada: 0.7s;
+}
+
+/* ---------- 2. Base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Garantiza que el atributo hidden siempre oculte (aunque la clase tenga display) */
+[hidden] {
+  display: none !important;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--esp-6) var(--esp-4);
+  font-family: var(--fuente);
+  font-size: var(--texto-base);
+  line-height: 1.55;
+  color: var(--color-texto);
+  /* Degradado animado de fondo */
+  background: linear-gradient(120deg, var(--fondo-1), var(--fondo-2), var(--fondo-3), var(--fondo-4));
+  background-size: 300% 300%;
+  animation: mover-degradado 20s ease infinite;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  color: var(--color-texto);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+h1 { font-size: var(--texto-xl); font-weight: 700; }
+h2 { font-size: var(--texto-lg); font-weight: 600; }
+p { margin: 0; }
+
+a {
+  color: var(--color-acento);
+  font-weight: 500;
+  text-decoration: none;
+  text-underline-offset: 3px;
+  transition: color var(--duracion-rapida) ease;
+}
+a:hover { color: var(--color-acento-hover); text-decoration: underline; }
+a:focus-visible {
+  outline: 2px solid var(--color-acento);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------- 3. Fondo con formas difuminadas (blobs) ---------- */
+.fondo {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(var(--blur-blob));
+  opacity: 0.45;
+  animation: mover-blob 24s ease-in-out infinite alternate;
+}
+.blob-1 {
+  width: min(460px, 80vw);
+  aspect-ratio: 1;
+  top: -140px;
+  left: -120px;
+  background: var(--color-azul);
+}
+.blob-2 {
+  width: min(420px, 75vw);
+  aspect-ratio: 1;
+  bottom: -140px;
+  right: -100px;
+  background: var(--color-violeta);
+  animation-duration: 28s;
+  animation-delay: -8s;
+}
+.blob-3 {
+  width: min(320px, 60vw);
+  aspect-ratio: 1;
+  top: 45%;
+  left: 60%;
+  background: var(--color-turquesa);
+  opacity: 0.35;
+  animation-duration: 32s;
+  animation-delay: -14s;
+}
+
+/* ---------- 4. Layout y tarjetas de cristal ---------- */
+.escena {
+  width: 100%;
+  max-width: var(--ancho-card);
+}
+.escena--ancha {
+  max-width: var(--ancho-card-ancha);
+}
+
+/* Contenedor que hace "flotar" la tarjeta suavemente */
+.flotante {
+  animation: flotar 7s ease-in-out infinite;
+}
+
+.card {
+  position: relative;
+  padding: var(--esp-6);
+  background: var(--color-vidrio);
+  -webkit-backdrop-filter: blur(var(--blur-vidrio)) saturate(160%);
+  backdrop-filter: blur(var(--blur-vidrio)) saturate(160%);
+  border: 1px solid var(--color-borde-vidrio);
+  border-radius: var(--radio-lg);
+  box-shadow: var(--sombra-card);
+  /* Entrada: aparece y sube. "backwards" libera el transform al terminar (para el hover) */
+  animation: entrada var(--duracion-entrada) var(--curva) backwards;
+  transition: transform var(--duracion) var(--curva), box-shadow var(--duracion) var(--curva);
+}
+
+/* Elevación al pasar el mouse (solo en dispositivos con mouse) */
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--sombra-card-hover);
+  }
+}
+
+/* Si el navegador no soporta blur, usamos un fondo más opaco para mantener el contraste */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .card { background: var(--color-vidrio-solido); }
+}
+
+/* Cabecera de la tarjeta: logo, título y subtítulo */
+.cabecera {
+  text-align: center;
+  margin-bottom: var(--esp-5);
+}
+.logo {
+  display: block;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto var(--esp-4);
+  filter: drop-shadow(0 10px 16px rgba(79, 70, 229, 0.3));
+}
+.logo--grande {
+  width: 76px;
+  height: 76px;
+}
+.subtitulo {
+  margin-top: var(--esp-2);
+  font-size: var(--texto-sm);
+  color: var(--color-texto-suave);
+}
+
+/* Texto pequeño debajo de la tarjeta */
+.pie {
+  margin-top: var(--esp-5);
+  text-align: center;
+  font-size: var(--texto-xs);
+  color: var(--color-texto-suave);
+}
+
+/* ---------- 5. Iconos de línea ---------- */
+.icono {
+  width: var(--tam-icono);
+  height: var(--tam-icono);
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---------- 6. Formularios ---------- */
+.campo {
+  margin-top: var(--esp-4);
+}
+.campo:first-child {
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: var(--texto-sm);
+  font-weight: 500;
+  color: var(--color-texto-2);
+}
+
+/* Contenedor del input con su icono a la izquierda */
+.control {
+  position: relative;
+}
+.control > .icono {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  color: var(--color-texto-suave);
+  pointer-events: none;
+  transition: color var(--duracion-rapida) ease;
+}
+.control:focus-within > .icono {
+  color: var(--color-acento);
+}
+
+input,
+select {
+  width: 100%;
+  height: var(--alto-control);
+  padding: 0 14px 0 44px;
+  font: inherit;
+  font-size: var(--texto-base); /* 16px evita el zoom automático en iPhone */
+  color: var(--color-texto);
+  background-color: var(--color-campo);
+  border: 1px solid var(--color-borde-campo);
+  border-radius: var(--radio-md);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color var(--duracion-rapida) ease, box-shadow var(--duracion-rapida) ease,
+    background-color var(--duracion-rapida) ease;
+}
+input::placeholder {
+  color: var(--color-placeholder);
+}
+input:hover,
+select:hover {
+  border-color: var(--color-borde-hover);
+}
+input:focus-visible,
+select:focus-visible {
+  border-color: var(--color-acento);
+  background-color: #fff;
+  box-shadow: var(--anillo-foco);
+}
+
+/* Select con flecha propia */
+select {
+  padding-right: 40px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 18px;
+}
+
+/* Campo de código de 6 dígitos: números grandes y espaciados */
+.input-codigo {
+  font-size: var(--texto-lg);
+  font-weight: 600;
+  letter-spacing: 0.35em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Lista de reglas de contraseña (se marcan en vivo) */
+.reglas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--texto-xs);
+  color: var(--color-texto-suave);
+}
+.reglas li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color var(--duracion) ease;
+}
+/* Círculo vacío que se rellena con un check al cumplirse la regla */
+.reglas li::before {
+  content: "";
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid rgba(15, 23, 42, 0.22);
+  border-radius: 50%;
+  background: transparent center / 10px no-repeat;
+  transition: background-color var(--duracion) var(--curva), border-color var(--duracion) var(--curva),
+    transform var(--duracion) var(--curva);
+}
+.reglas li.ok {
+  color: var(--color-exito);
+}
+.reglas li.ok::before {
+  border-color: var(--color-exito);
+  background-color: var(--color-exito);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+  transform: scale(1.1);
+}
+
+/* ---------- 7. Botones ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: var(--alto-control);
+  margin-top: var(--esp-5);
+  padding: 0 var(--esp-5);
+  font: inherit;
+  font-size: var(--texto-base);
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: var(--radio-md);
+  cursor: pointer;
+  transition: transform var(--duracion-rapida) ease, box-shadow var(--duracion-rapida) ease,
+    background-color var(--duracion-rapida) ease, border-color var(--duracion-rapida) ease,
+    opacity var(--duracion-rapida) ease;
+}
+.btn:hover {
+  text-decoration: none;
+}
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+
+/* Botón principal con degradado del acento */
+.btn-primario {
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-acento), var(--color-violeta));
+  box-shadow: var(--sombra-boton);
+}
+.btn-primario:hover {
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: var(--sombra-boton-hover);
+}
+.btn-primario:focus-visible {
+  box-shadow: var(--anillo-foco), var(--sombra-boton);
+}
+
+/* Botón secundario de cristal */
+.btn-secundario {
+  color: var(--color-acento);
+  background: rgba(255, 255, 255, 0.6);
+  border-color: var(--color-borde-campo);
+}
+.btn-secundario:hover {
+  color: var(--color-acento-hover);
+  background: #fff;
+  border-color: var(--color-borde-hover);
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* La flecha se mueve un poco a la derecha al pasar el mouse */
+.btn .icono-flecha {
+  transition: transform var(--duracion-rapida) ease;
+}
+.btn:hover .icono-flecha {
+  transform: translateX(3px);
+}
+
+/* Estado de carga: mientras el botón está deshabilitado se muestra un spinner */
+.btn:disabled {
+  cursor: progress;
+  opacity: 0.85;
+  transform: none;
+}
+.btn:disabled .icono {
+  display: none;
+}
+.btn:disabled::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: girar 0.7s linear infinite;
+}
+
+/* Grupo de botones apilados */
+.acciones {
+  display: grid;
+  gap: var(--esp-3);
+  margin-top: var(--esp-5);
+}
+.acciones .btn {
+  margin-top: 0;
+}
+
+/* ---------- 8. Mensajes de éxito y error ---------- */
+.msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: var(--esp-4);
+  padding: 12px 14px;
+  font-size: var(--texto-sm);
+  line-height: 1.45;
+  border: 1px solid transparent;
+  border-radius: var(--radio-md);
+  animation: aparecer var(--duracion) var(--curva);
+}
+/* Icono del mensaje (se dibuja con una máscara del color del texto) */
+.msg::before {
+  content: "";
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  background-color: currentColor;
+  -webkit-mask: var(--icono-msg) center / contain no-repeat;
+  mask: var(--icono-msg) center / contain no-repeat;
+}
+.msg.error {
+  color: var(--color-error);
+  background: var(--color-error-fondo);
+  border-color: var(--color-error-borde);
+  --icono-msg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 8v4M12 16h.01'/%3E%3C/svg%3E");
+}
+.msg.ok {
+  color: var(--color-exito);
+  background: var(--color-exito-fondo);
+  border-color: var(--color-exito-borde);
+  --icono-msg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E");
+}
+
+/* ---------- 9. Componentes extra ---------- */
+/* Enlaces al pie de la tarjeta */
+.enlaces {
+  margin-top: var(--esp-5);
+  text-align: center;
+  font-size: var(--texto-sm);
+  color: var(--color-texto-suave);
+}
+
+/* Separador con texto, ej: "o continúa con" */
+.divisor {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  margin: var(--esp-5) 0;
+  font-size: var(--texto-xs);
+  color: var(--color-texto-suave);
+}
+.divisor::before,
+.divisor::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-borde-campo);
+}
+
+/* Etiqueta tipo "píldora" (estado del servidor, rol, tienda...) */
+.pildora {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  font-size: var(--texto-xs);
+  font-weight: 500;
+  color: var(--color-texto-2);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--color-borde-campo);
+  border-radius: var(--radio-total);
+}
+/* Punto que "late" dentro de la píldora */
+.pildora--viva::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-acento);
+  box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.5);
+  animation: latido 2s ease-out infinite;
+}
+
+/* Lista de características con icono */
+.caracteristicas {
+  display: grid;
+  gap: var(--esp-3);
+  margin: var(--esp-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.caracteristicas li {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  font-size: var(--texto-sm);
+  color: var(--color-texto-2);
+}
+.caracteristicas .icono {
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  color: var(--color-acento);
+  background: var(--color-acento-suave);
+  border-radius: var(--radio-sm);
+}
+.centrado {
+  text-align: center;
+}
+
+/* ---------- 10. Animaciones ---------- */
+@keyframes entrada {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+}
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@keyframes flotar {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes mover-degradado {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@keyframes mover-blob {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(50px, -40px) scale(1.08); }
+  100% { transform: translate(-40px, 40px) scale(0.94); }
+}
+@keyframes girar {
+  to { transform: rotate(360deg); }
+}
+@keyframes latido {
+  70% { box-shadow: 0 0 0 8px rgba(79, 70, 229, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+}
+
+/* ---------- 11. Responsivo (celulares) ---------- */
+@media (max-width: 480px) {
+  body {
+    padding: var(--esp-5) var(--esp-4);
+  }
+  .card {
+    padding: var(--esp-5) var(--esp-4);
+    border-radius: 22px;
+  }
+  .reglas {
+    grid-template-columns: 1fr;
+  }
+  :root {
+    --blur-blob: 55px;
+  }
+}
+
+/* ---------- 12. Accesibilidad: sin animaciones si el usuario lo pide ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
