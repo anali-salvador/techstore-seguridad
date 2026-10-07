@@ -225,7 +225,7 @@ Luego cerrar sesión y volver a entrar. Desde ahí, los roles se gestionan en **
 |---|---|
 | `npm start` | Inicia el servidor |
 | `npm run dev` | Inicia el servidor con nodemon (se reinicia al guardar) |
-| `npm run verificar` | Lista los grupos de Cognito y lee la tabla de DynamoDB |
+| `npm run verificar` | Revisa el `.env` (sin mostrar valores), grupos y usuarios por rol, atributos, permisos IAM, scopes, proveedor Google y DynamoDB. Marca con ✅ o ❌ cada paso |
 | `npm run semilla` | Carga productos de ejemplo (IDs fijos: no duplica si se repite) |
 
 ## Variables de entorno
