@@ -5,6 +5,7 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const config = require('./config/env');
 const authRoutes = require('./routes/auth');
+const mfaRoutes = require('./routes/mfa');
 
 const app = express();
 
@@ -33,7 +34,11 @@ app.get('/api/health', (req, res) => {
 
 // Rutas de la API
 app.use('/api', authRoutes);
+app.use('/api/mfa', mfaRoutes);
 
 app.listen(config.port, () => {
   console.log(`TechStore escuchando en http://localhost:${config.port}`);
 });
+
+// Se exporta la app para poder probarla
+module.exports = app;

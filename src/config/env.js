@@ -1,6 +1,8 @@
 // Carga las variables del archivo .env y las expone en un solo objeto.
 // Así el resto del código no lee process.env directamente.
-require('dotenv').config();
+// Se usa la ruta absoluta para que funcione aunque el servidor se inicie desde otra carpeta.
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
 
 const config = {
   port: process.env.PORT || 3000,

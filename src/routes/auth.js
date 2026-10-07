@@ -3,13 +3,10 @@ const express = require('express');
 const { TIENDAS, esTiendaValida } = require('../config/tiendas');
 const { validarPassword, validarEmail } = require('../services/validaciones');
 const cognito = require('../services/cognito');
-const ContadorIntentos = require('../services/intentos');
-const config = require('../config/env');
+const { intentosLogin, intentosMfa } = require('../services/contadores');
+const jwt = require('../services/jwt');
 
 const router = express.Router();
-
-// Contador visible de intentos de login: 5 fallos -> bloqueo de 15 minutos
-const intentosLogin = new ContadorIntentos(config.maxLoginAttempts, config.loginBloqueoMinutos);
 
 // A qué página va el usuario según el reto MFA que devuelve Cognito
 const PAGINAS_MFA = {
@@ -106,6 +103,16 @@ router.post('/auth/login', async (req, res) => {
     return res.status(423).json({ error: 'Cuenta bloqueada temporalmente por intentos fallidos.', intentos: previo });
   }
 
+  // Si falló 3 veces el código MFA, tampoco puede volver a intentar hasta que pase el bloqueo.
+  // Se revisa ANTES de consultar la contraseña para no revelar si era correcta.
+  const mfa = intentosMfa.estado(email);
+  if (mfa.bloqueado) {
+    return res.status(423).json({
+      error: 'La verificación en dos pasos está bloqueada por 3 códigos incorrectos.',
+      intentos: { ...previo, bloqueado: true, segundosBloqueo: mfa.segundosBloqueo },
+    });
+  }
+
   let respuesta;
   try {
     respuesta = await cognito.iniciarSesion(email, password);
@@ -161,6 +168,34 @@ router.post('/auth/login', async (req, res) => {
     reto,
     siguiente: PAGINAS_MFA[reto],
   });
+});
+
+// GET /api/auth/sesion -> datos del usuario según su JWT (verificado)
+router.get('/auth/sesion', async (req, res) => {
+  const token = req.cookies[jwt.COOKIE_ID];
+  if (!token) return res.status(401).json({ error: 'No has iniciado sesión.' });
+  try {
+    const claims = await jwt.verificarIdToken(token);
+    res.json({
+      usuario: jwt.datosUsuario(claims),
+      // Solo una vista parcial del token, como evidencia (el token completo nunca sale de la cookie)
+      token: { vista: `${token.slice(0, 32)}…${token.slice(-12)}`, longitud: token.length },
+    });
+  } catch (err) {
+    jwt.borrarTokens(res);
+    res.status(401).json({ error: 'Tu sesión no es válida o expiró. Inicia sesión de nuevo.' });
+  }
+});
+
+// POST /api/auth/logout -> cierra la sesión en Cognito y en la app
+router.post('/auth/logout', async (req, res) => {
+  const accessToken = req.cookies[jwt.COOKIE_ACCESS];
+  if (accessToken) {
+    // Invalida los tokens en Cognito; si ya expiraron, igual seguimos cerrando sesión
+    await cognito.cerrarSesionGlobal(accessToken).catch((err) => console.error('[logout]', err.name));
+  }
+  jwt.borrarTokens(res);
+  req.session.destroy(() => res.json({ mensaje: 'Sesión cerrada.' }));
 });
 
 module.exports = router;

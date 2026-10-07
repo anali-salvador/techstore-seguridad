@@ -5,6 +5,10 @@ const {
   ConfirmSignUpCommand,
   ResendConfirmationCodeCommand,
   InitiateAuthCommand,
+  AssociateSoftwareTokenCommand,
+  VerifySoftwareTokenCommand,
+  RespondToAuthChallengeCommand,
+  GlobalSignOutCommand,
   AdminUpdateUserAttributesCommand,
   AdminAddUserToGroupCommand,
 } = require('@aws-sdk/client-cognito-identity-provider');
@@ -76,6 +80,54 @@ async function iniciarSesion(email, password) {
   );
 }
 
+// ----- MFA TOTP -----
+
+// 5a) Primer login (reto MFA_SETUP): Cognito genera la clave secreta TOTP del usuario.
+//     Devuelve SecretCode (va dentro del QR) y una Session nueva.
+async function asociarTotp(session) {
+  return cognito.send(new AssociateSoftwareTokenCommand({ Session: session }));
+}
+
+// 5b) Comprueba el primer código de Google Authenticator y activa el MFA TOTP.
+async function verificarTotp(session, codigo) {
+  return cognito.send(
+    new VerifySoftwareTokenCommand({
+      Session: session,
+      UserCode: codigo,
+      FriendlyDeviceName: 'Google Authenticator',
+    })
+  );
+}
+
+// 5c) Termina el reto MFA_SETUP y obtiene los JWT
+async function completarConfiguracionMfa(session, email) {
+  return cognito.send(
+    new RespondToAuthChallengeCommand({
+      ClientId: clientId,
+      ChallengeName: 'MFA_SETUP',
+      Session: session,
+      ChallengeResponses: { USERNAME: email },
+    })
+  );
+}
+
+// 6) Logins siguientes (reto SOFTWARE_TOKEN_MFA): envía el código de 6 dígitos
+async function responderCodigoMfa(session, email, codigo) {
+  return cognito.send(
+    new RespondToAuthChallengeCommand({
+      ClientId: clientId,
+      ChallengeName: 'SOFTWARE_TOKEN_MFA',
+      Session: session,
+      ChallengeResponses: { USERNAME: email, SOFTWARE_TOKEN_MFA_CODE: codigo },
+    })
+  );
+}
+
+// 7) Cierre de sesión global: Cognito invalida los tokens de ese usuario
+async function cerrarSesionGlobal(accessToken) {
+  return cognito.send(new GlobalSignOutCommand({ AccessToken: accessToken }));
+}
+
 // Traduce los errores de Cognito a mensajes en español para el usuario
 function traducirError(err) {
   const mensajes = {
@@ -99,6 +151,11 @@ module.exports = {
   confirmarRegistro,
   reenviarCodigo,
   iniciarSesion,
+  asociarTotp,
+  verificarTotp,
+  completarConfiguracionMfa,
+  responderCodigoMfa,
+  cerrarSesionGlobal,
   traducirError,
   GRUPO_POR_DEFECTO,
 };
